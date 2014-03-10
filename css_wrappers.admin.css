@@ -1,0 +1,88 @@
+.css-wrappers-dfn {
+    color: #808080;
+    display: inline-block;
+    margin: 5px;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.4;
+    border: 1px solid;
+    border-radius: 2px;
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+    position: relative;
+    cursor: pointer;
+}
+.css-wrappers-dfn div.wrapper-info-wrap {
+    display: none;
+    position: absolute;
+    background: #333333;
+    color: #fff;
+    white-space: nowrap;
+    z-index: 10;
+    bottom: 100%;
+    right: -30px;
+    margin-bottom: 2px;
+    padding: 0.5em 1em;
+}
+div.wrapper-info-wrap::before {
+    content: '';
+    display: block;
+    position: absolute;
+    border: 5px solid transparent;
+    border-top-color: #333333;
+    border-bottom-width: 0;
+    top: 100%;
+    right: 32px;
+}
+.css-wrappers-dfn:hover div.wrapper-info-wrap {
+    display: block;
+    text-align: center;
+    cursor: default;
+}
+span.wrapper-info.wrapper-selector {
+    font-family: monospace;
+    font-weight: normal;
+    font-size: 1.5em;
+    display: block;
+}
+span.wrapper-info.wrapper-inheritance {
+    font-weight: normal;
+    color: #d4d4d4;
+    font-style: italic;
+}
+
+.css-wrappers-dfn.inheritance-enabled, .css-wrappers-dfn.inheritance-instance_view_current, .css-wrappers-dfn.inheritance-group_direct {
+    color: #008000;
+}
+.css-wrappers-dfn.inheritance-enabled span.wrapper-info.wrapper-inheritance, .css-wrappers-dfn.inheritance-instance_view_current span.wrapper-info.wrapper-inheritance, .css-wrappers-dfn.inheritance-group_direct span.wrapper-info.wrapper-inheritance {
+    color: #17d106;
+}
+.css-wrappers-dfn.inheritance-instance_field_group, .css-wrappers-dfn.inheritance-group_parent {
+    color: #ff5eca;
+}
+.css-wrappers-dfn.inheritance-instance_field_group span.wrapper-info.wrapper-inheritance, .css-wrappers-dfn.inheritance-group_parent span.wrapper-info.wrapper-inheritance {
+    color: #ffa4ca;
+}
+.css-wrappers-dfn.inheritance-instance_view_default {
+    color: #6da0ef;
+}
+.css-wrappers-dfn.inheritance-instance_view_default span.wrapper-info.wrapper-inheritance {
+    color: #97d7ef;
+}
+div.css-wrapper-enabled {
+    float: left;
+    width: 2em;
+    top: -0.8em;
+    position: relative;
+}
+div.css-wrapper-enabled ~ div.form-type-textfield input.form-text {
+    margin-left: -2em;
+    font-family: monospace;
+    font-size: 1.5em;
+}
+div.css-wrappers-options {
+    float: right;
+    position: relative;
+    margin-top: -2.7em;
+}

@@ -1,0 +1,7 @@
+name = CSS Field Group Wrappers
+description = Enabled CSS field wrapper inheritance from field groups.
+core = 7.x
+package = CSS Wrappers
+
+dependencies[] = css_wrappers
+dependencies[] = field_group

@@ -1,0 +1,4 @@
+name = CSS Field Wrappers
+description = Create wrapper elements for fields using css selectors
+core = 7.x
+package = CSS Wrappers
