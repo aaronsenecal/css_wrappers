@@ -141,7 +141,7 @@ function css_wrappers_field_group_field_group_format_summary($group)
                     '<dfn class="css-wrappers-dfn inheritance-' .  ($wrapper['enabled'] ? 'enabled' : 'disabled') . '">' .
                     $label[0] .
                     '<div class="wrapper-info-wrap">' .
-                    '<span class="wrapper-info wrapper-type">' . $label . '</span>' .
+                    '<span class="wrapper-info wrapper-type">' .t('Contained ' . $label) . '</span>' .
                     '<span class="wrapper-info wrapper-inheritance"> - ' . ($wrapper['enabled'] ? 'Enabled' : 'Disabled' ) . '</span>' .
                     ($wrapper['enabled'] ? ('<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>') : '') .
                     '</div>' .
@@ -180,7 +180,7 @@ function css_wrappers_field_group_field_group_format_settings($group)
                     '#tree' => TRUE,
                     '#collapsible' => FALSE,
                     '#type' => 'fieldset',
-                    '#title' => t('Field Wrappers'),
+                    '#title' => t('Contained Field Wrappers'),
                     '#description' => t('These wrappers will be applied, by default to any field contained in this field group.'),
                 ),
             ),

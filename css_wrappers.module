@@ -90,10 +90,10 @@ function theme_field_css_wrappers($variables) {
         $items_rendered .= _css_wrappers_build_wrapper_string($item_wrapper, $item);
     }
     $output .= _css_wrappers_build_wrapper_string($variables['content_wrapper'], $items_rendered);
-    $output = _css_wrappers_build_wrapper_string($variables['field_wrapper'], $output);
     if ($output && !$variables['label_hidden']) {
         $output = _css_wrappers_build_wrapper_string($variables['label_wrapper'], $variables['label']) . $output;
     }
+    $output = _css_wrappers_build_wrapper_string($variables['field_wrapper'], $output);
     return $output;
 }
 function _css_wrappers_build_wrapper_prefix($wrappers) {
