@@ -353,15 +353,18 @@ function css_wrappers_field_group_module_implements_alter(&$implementations, $ho
 }
 function css_wrappers_field_group_form_field_ui_display_overview_form_alter(&$form, $form_state) {
     $end = '<!-- css wrappers start hide -->';
-    foreach($form['#groups'] as $name) {
-        $group = &$form['fields'][$name];
-        if (isset($group['format']['format_settings']['actions']['save_settings'])) {
-            array_unshift($group['format']['format_settings']['actions']['save_settings']['#submit'], 'css_wrappers_field_group_format_settings_form_submit');
-        }
-        if (stristr($group['settings_summary']['#markup'], $end) !== FALSE) {
-            $group['settings_summary']['#markup'] = substr($group['settings_summary']['#markup'], 0, strpos($group['settings_summary']['#markup'], $end)) . '</div>';
+    if (isset($form['#groups'])) {
+        foreach($form['#groups'] as $name) {
+            $group = &$form['fields'][$name];
+            if (isset($group['format']['format_settings']['actions']['save_settings'])) {
+                array_unshift($group['format']['format_settings']['actions']['save_settings']['#submit'], 'css_wrappers_field_group_format_settings_form_submit');
+            }
+            if (stristr($group['settings_summary']['#markup'], $end) !== FALSE) {
+                $group['settings_summary']['#markup'] = substr($group['settings_summary']['#markup'], 0, strpos($group['settings_summary']['#markup'], $end)) . '</div>';
+            }
         }
     }
+
 }
 function css_wrappers_field_group_format_settings_form_submit(&$form, &$form_state) {
     $editing = $form_state['formatter_settings_edit'];

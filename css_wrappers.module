@@ -44,8 +44,18 @@ function css_wrappers_process_field(&$variables) {
                         }
                         break;
                     case 'content':
-                        if ($wrapper['options']['default_attrs'] && isset($variables['title_attributes_array'])) {
-                            $defaults = $variables['title_attributes_array'];
+                        if ($wrapper['options']['default_attrs']) {
+                            if (empty($variables['css_wrappers']['field']['elements'])) {
+                                if (isset($variables['attributes_array'])) {
+                                    $defaults = $variables['attributes_array'];
+                                }
+                                if (isset($variables['classes_array'])) {
+                                    $defaults['class'] = isset($defaults['class'])? array_unique(array_merge($defaults['class'], $variables['classes_array'])) : $variables['classes_array'];
+                                }
+                            }
+                            if (isset($variables['content_attributes_array'])) {
+                                $defaults += $variables['content_attributes_array'];
+                            }
                         }
                         break;
                     case 'item':
@@ -310,7 +320,7 @@ function css_wrappers_from_css_selector($selector = '', $validate = FALSE) {
         'attributes' => '\[([a-zA-Z][a-zA-Z0-9\-_]*?)=(?:"|\')(.*?)(?:"|\')\]',
         'class' => '\.([a-zA-Z][a-zA-Z0-9-_]+)',
         'id' => '#([a-zA-Z][a-zA-Z0-9-_]+)',
-        'tag' => '(?:^|\s)([a-zA-Z][a-zA-Z0-9]+)',
+        'tag' => '(?:^|\s)([a-zA-Z][a-zA-Z0-9]*)',
     );
     $replace_patterns = array(
         'attributes' => array(),
