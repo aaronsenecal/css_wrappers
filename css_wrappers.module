@@ -224,6 +224,9 @@ function css_wrappers_field_formatter_settings_form_alter(array &$form, array &$
                 '#css_wrapper' => $name,
                 '#css_wrapper_group' => 'field',
                 '#disabled' => TRUE,
+                '#attributes' => array(
+                    'placeholder' => t('No Wrapper'),
+                ),
                 '#states' => array(
                     'visible' => array(
                         ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => FALSE),
@@ -244,6 +247,9 @@ function css_wrappers_field_formatter_settings_form_alter(array &$form, array &$
                 '#field_name' => $field_name,
                 '#css_wrapper' => $name,
                 '#css_wrapper_group' => 'field',
+                '#attributes' => array(
+                    'placeholder' => t('No Wrapper'),
+                ),
                 '#states' => array(
                     'visible' => array(
                         ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => TRUE),

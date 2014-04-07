@@ -210,6 +210,9 @@ function css_wrappers_field_group_field_group_format_settings($group)
                     '#field_name' => $group->group_name,
                     '#css_wrapper' => $name,
                     '#disabled' => TRUE,
+                    '#attributes' => array(
+                        'placeholder' => t('No Wrapper'),
+                    ),
                     '#states' => array(
                         'visible' => array(
                             ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group]['.$name.'][enabled]"]' => array('checked' => FALSE),
@@ -230,6 +233,9 @@ function css_wrappers_field_group_field_group_format_settings($group)
                     '#field_name' => $group_name,
                     '#css_wrapper' => $name,
                     '#css_wrapper_group' => 'field_group',
+                    '#attributes' => array(
+                        'placeholder' => t('No Wrapper'),
+                    ),
                     '#states' => array(
                         'visible' => array(
                             ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group]['.$name.'][enabled]"]' => array('checked' => TRUE),
@@ -289,6 +295,9 @@ function css_wrappers_field_group_field_group_format_settings($group)
                     '#css_wrapper' => $name,
                     '#css_wrapper_group' => 'field',
                     '#disabled' => TRUE,
+                    '#attributes' => array(
+                        'placeholder' => t('No Wrapper'),
+                    ),
                     '#states' => array(
                         'visible' => array(
                             ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => FALSE),
@@ -309,6 +318,9 @@ function css_wrappers_field_group_field_group_format_settings($group)
                     '#field_name' => $group_name,
                     '#css_wrapper' => $name,
                     '#css_wrapper_group' => 'field',
+                    '#attributes' => array(
+                        'placeholder' => t('No Wrapper'),
+                    ),
                     '#states' => array(
                         'visible' => array(
                             ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => TRUE),
