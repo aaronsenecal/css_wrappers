@@ -128,7 +128,7 @@ function theme_field_css_wrappers($variables) {
  * @param bool|enum $partial Pass in 'prefix' to return the only first half of the rendered $wrappers, and 'suffix' to return only the last half. FALSE (default) to return the wrapped content.
  * @return string The rendered wrappers and/or content.
  */
-function _css_wrappers_build_wrapper_string(array $wrappers, array $content = array(), $partial = FALSE) {
+function _css_wrappers_build_wrapper_string($wrappers = array(), $content = array(), $partial = FALSE) {
     $content_rendered = $partial ? TRUE : render($content);
     if (!$content_rendered) {
         return '';
@@ -161,7 +161,7 @@ function _css_wrappers_build_wrapper_string(array $wrappers, array $content = ar
  * @param array $wrappers an array representing nested HTML tags.
  * @return string The rendered prefix.
  */
-function _css_wrappers_build_wrapper_prefix(array $wrappers) {
+function _css_wrappers_build_wrapper_prefix($wrappers = array()) {
     return _css_wrappers_build_wrapper_string($wrappers, NULL, 'prefix');
 }
 
@@ -171,7 +171,7 @@ function _css_wrappers_build_wrapper_prefix(array $wrappers) {
  * @param array $wrappers
  * @return string
  */
-function _css_wrappers_build_wrapper_suffix(array $wrappers) {
+function _css_wrappers_build_wrapper_suffix($wrappers = array()) {
     return _css_wrappers_build_wrapper_string($wrappers, NULL, 'suffix');
 }
 
@@ -508,9 +508,7 @@ function css_wrappers_info() {
                 drupal_alter(array('css_wrapper_types', 'css_wrapper_types_' . $name), $types, $name);
                 foreach ($types as $type => $wrapper) {
                     $type = check_plain($type);
-                    $type_clone = $type;
                     $wrapper['options'] = isset($wrapper['options']) ? $wrapper['options'] + $options : $options;
-                    drupal_alter(array('css_wrapper_type', 'css_wrapper_type_' . $type), $wrapper, $type_clone);
                     $selector = '';
                     $elements = array();
                     $wrapper['label'] = !empty($wrapper['label']) ? check_plain($wrapper['label']) : t('Unnamed wrapper: ' . check_plain($type));

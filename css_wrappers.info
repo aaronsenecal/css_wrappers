@@ -1,4 +1,4 @@
 name = CSS Field Wrappers
-description = Create wrapper elements for fields using css selectors
+description = Control the HTML markup surrounding the content of your Drupal site with simple, CSS-like selectors.
 core = 7.x
 package = CSS Wrappers
