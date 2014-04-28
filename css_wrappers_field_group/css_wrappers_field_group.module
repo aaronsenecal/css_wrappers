@@ -205,6 +205,7 @@ function css_wrappers_field_group_field_group_format_settings($group)
                 'default' => array(
                     '#type' => 'textfield',
                     '#title' => t($label),
+                    '#maxlength' => 255,
                     '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
                     '#default_value' => $fallback['selector'],
                     '#field_name' => $group->group_name,
@@ -227,6 +228,7 @@ function css_wrappers_field_group_field_group_format_settings($group)
                 'selector' => array(
                     '#type' => 'textfield',
                     '#title' => t($label),
+                    '#maxlength' => 255,
                     '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
                     '#default_value' => $wrapper['selector'],
                     '#element_validate' => array('css_wrappers_form_selector_validate'),
@@ -289,6 +291,7 @@ function css_wrappers_field_group_field_group_format_settings($group)
                 'default' => array(
                     '#type' => 'textfield',
                     '#title' => t($label),
+                    '#maxlength' => 255,
                     '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
                     '#default_value' => $fallback['selector'],
                     '#field_name' => $group_name,
@@ -312,6 +315,7 @@ function css_wrappers_field_group_field_group_format_settings($group)
                 'selector' => array(
                     '#type' => 'textfield',
                     '#title' => t($label),
+                    '#maxlength' => 255,
                     '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
                     '#default_value' => $wrapper['selector'],
                     '#element_validate' => array('css_wrappers_form_selector_validate'),

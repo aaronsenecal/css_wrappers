@@ -266,6 +266,7 @@ function css_wrappers_field_formatter_settings_form_alter(array &$form, array &$
             'default' => array(
                 '#type' => 'textfield',
                 '#title' => t($label),
+                '#maxlength' => 255,
                 '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
                 '#default_value' => $fallback['selector'],
                 '#field_name' => $field_name,
@@ -289,6 +290,7 @@ function css_wrappers_field_formatter_settings_form_alter(array &$form, array &$
             'selector' => array(
                 '#type' => 'textfield',
                 '#title' => t($label),
+                '#maxlength' => 255,
                 '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
                 '#default_value' => $wrapper['selector'],
                 '#element_validate' => array('css_wrappers_field_validate_process'),
