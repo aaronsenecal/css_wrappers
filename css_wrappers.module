@@ -73,7 +73,7 @@ function css_wrappers_process_field(&$variables) {
                 }
                 if ($name !== 'item') {
                     foreach ($attributes as $attribute => $value) {
-                        $defaults[$attribute] = isset($defaults[$attribute]) ?  array_unique(array_merge($value, $defaults[$attribute])): $value;
+                        $defaults[$attribute] = isset($defaults[$attribute]) && is_array($defaults[$attribute]) ?  array_unique(array_merge($value, $defaults[$attribute])): $value;
                     }
                     $element['#attributes_processed'] = empty($defaults) ? '' : drupal_attributes($defaults);
                 } else {
@@ -106,11 +106,20 @@ function theme_field_css_wrappers($variables) {
     $item_wrapper = $variables['item_wrapper'];
     $item_wrapper_empty = empty($item_wrapper);
     foreach ($variables['items'] as $delta => $item) {
+        $item_prefix = $item_suffix = '';
         if (!$item_wrapper_empty) {
             unset($item_wrapper[0]['#attributes_processed']);
             $item_wrapper[0]['#attributes_processed'] = $variables['item_wrapper'][0]['#attributes_processed'][$delta];
         }
-        $items_rendered .= _css_wrappers_build_wrapper_string($item_wrapper, $item);
+        if (!empty($item['#prefix'])) {
+            $item_prefix = $item['#prefix'];
+            $item['#prefix'] = '';
+        }
+        if (!empty($item['#suffix'])) {
+            $item_suffix = $item['#suffix'];
+            $item['#suffix'] = '';
+        }
+        $items_rendered .= $item_prefix . _css_wrappers_build_wrapper_string($item_wrapper, $item) . $item_suffix;
     }
     $output .= _css_wrappers_build_wrapper_string($variables['content_wrapper'], $items_rendered);
     if ($output && !$variables['label_hidden']) {
