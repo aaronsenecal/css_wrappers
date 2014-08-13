@@ -2,3 +2,5 @@ name = CSS Field Wrappers
 description = Control the HTML markup surrounding the content of your Drupal site with simple, CSS-like selectors.
 core = 7.x
 package = CSS Wrappers
+
+dependencies[] = 'field_formatter_settings'
