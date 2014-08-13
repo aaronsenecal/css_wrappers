@@ -53,4 +53,4 @@ During the definition of wrapper groups in `css_wrapper_info()`, several alter h
 - `hook_css_wrapper_HOOK_alter()` and `hook_css_wrapper_HOOK_GROUPNAME_alter()`, are invoked for each of the keys at the base of a group's definition array (i. e. `options`, `inheritance`, then `types`) as `HOOK`, for each group in the case in the former, and groups matching `GROUPNAME` in the case of the latter.
 
 ## What's next?
-This module is, at this point, not ideal for use in production sites. The [issue queue](https://gitlab.cws.oregonstate.edu/aaron.senecal/css-wrappers/issues) outlines several important performance, user-interface and workflow enhancements that should be completed before CSS Wrappers is production-ready.
+This module is, at this point, not ideal for use in production sites. There are a number of performance enhancements that should be implemented before CSS Wrappers is production-ready.
