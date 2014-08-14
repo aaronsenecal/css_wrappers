@@ -5,164 +5,235 @@ define('CSS_WRAPPERS_DEFAULT_SELECTOR_LABEL', 'div.label-wrapper');
 define('CSS_WRAPPERS_DEFAULT_SELECTOR_CONTENT', 'div.content-wrapper');
 define('CSS_WRAPPERS_DEFAULT_SELECTOR_ITEM', 'div.item-wrapper');
 
+
 /**
  * Implements hook_theme().
  */
 function css_wrappers_theme($existing, $type, $theme, $path) {
-    return array (
-        'field__css_wrappers' => array (
-            'function' => 'theme_field_css_wrappers',
-        ),
-    );
+  return array (
+    'field__css_wrappers' => array (
+      'function' => 'theme_field_css_wrappers',
+    ),
+  );
 }
 
+
 /**
- * Implements hook_process_HOOK().
+ * Implements hook_process_field().
  */
 function css_wrappers_process_field(&$variables) {
-    $element = $variables['element'];
-    $view_mode = $element['#view_mode'];
-    $info = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
-    $wrappers = css_wrappers_inherit($info + array('view_mode' => $view_mode), 'field');
-    if (!empty($wrappers)) {
-        $variables['css_wrappers'] = $wrappers;
-        $variables['theme_hook_suggestion'] = 'field__css_wrappers';
-        $variables['css_wrapper_types'] = css_wrappers_group_types('field', TRUE);
-        foreach ($variables['css_wrapper_types'] as $name) {
-            if (!empty($variables['css_wrappers'][$name]['elements'])) {
-                $wrapper = &$variables['css_wrappers'][$name];
-                $element = &$wrapper['elements'][0];
-                $attributes = isset($element['#attributes']) ? $element['#attributes'] : array();
-                $defaults = array();
-                switch ($name) {
-                    case 'field':
-                        if ($wrapper['options']['default_attrs']) {
-                            if (isset($variables['attributes_array'])) {
-                                $defaults = $variables['attributes_array'];
-                            }
-                            if (isset($variables['classes_array'])) {
-                                $defaults['class'] = isset($defaults['class'])? array_unique(array_merge($defaults['class'], $variables['classes_array'])) : $variables['classes_array'];
-                            }
-                        }
-                        break;
-                    case 'label':
-                        if ($wrapper['options']['default_attrs'] && isset($variables['title_attributes_array'])) {
-                            $defaults = $variables['title_attributes_array'];
-                        }
-                        break;
-                    case 'content':
-                        if ($wrapper['options']['default_attrs']) {
-                            if (empty($variables['css_wrappers']['field']['elements'])) {
-                                if (isset($variables['attributes_array'])) {
-                                    $defaults = $variables['attributes_array'];
-                                }
-                                if (isset($variables['classes_array'])) {
-                                    $defaults['class'] = isset($defaults['class'])? array_unique(array_merge($defaults['class'], $variables['classes_array'])) : $variables['classes_array'];
-                                }
-                            }
-                            if (isset($variables['content_attributes_array'])) {
-                                $defaults += $variables['content_attributes_array'];
-                            }
-                        }
-                        break;
-                    case 'item':
-                        foreach($variables['items'] as $delta => $item) {
-                            $defaults[$delta] = ($wrapper['options']['default_attrs'] && isset($variables['item_attributes_array'][$delta])) ? $variables['item_attributes_array'][$delta] : array();
-                        }
-                        break;
-                }
-                if ($name !== 'item') {
-                    foreach ($attributes as $attribute => $value) {
-                        $defaults[$attribute] = isset($defaults[$attribute]) && is_array($defaults[$attribute]) ?  array_unique(array_merge($value, $defaults[$attribute])): $value;
-                    }
-                    $element['#attributes_processed'] = empty($defaults) ? '' : drupal_attributes($defaults);
-                } else {
-                    foreach ($defaults as $delta => $item) {
-                        foreach ($attributes as $attribute => $value) {
-                            $defaults[$delta][$attribute] = isset($defaults[$delta][$attribute]) ?  array_unique(array_merge($value, $defaults[$delta][$attribute])): $value;
-                        }
-                        $element['#attributes_processed'][$delta] = empty($defaults[$delta]) ? '' : drupal_attributes($defaults[$delta]);
-                    }
-                }
-                for ($i = 1; $i < count($wrapper['elements']); $i++) {
-                    $wrapper['elements'][$i]['#attributes_processed'] = empty($wrapper['elements'][$i]['#attributes']) ? '' : drupal_attributes($wrapper['elements'][$i]['#attributes']);
-                }
-                $variables[$name.'_wrapper'] = $wrapper['elements'];
-            }
-            else $variables[$name.'_wrapper'] = array();
+  $element = $variables['element'];
+  $view_mode = $element['#view_mode'];
+  $info = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
+  $wrappers = css_wrappers_inherit($info + array('view_mode' => $view_mode), 'field');
+  if (!empty($wrappers)) {
+    $variables['css_wrappers'] = $wrappers;
+    $variables['theme_hook_suggestion'] = 'field__css_wrappers';
+    $variables['css_wrapper_types'] = css_wrappers_group_types('field', TRUE);
+    foreach ($variables['css_wrapper_types'] as $name) {
+      if (!empty($variables['css_wrappers'][$name]['elements'])) {
+        $wrapper = &$variables['css_wrappers'][$name];
+        $element = &$wrapper['elements'][0];
+        if (isset($element['#attributes'])) {
+          $attributes = $element['#attributes'];
         }
+        else {
+          $attributes = array();
+        }
+        $defaults = array();
+        switch ($name) {
+          case 'field':
+            if ($wrapper['options']['default_attrs']) {
+              if (isset($variables['attributes_array'])) {
+                $defaults = $variables['attributes_array'];
+              }
+              if (isset($variables['classes_array'])) {
+                if (isset($defaults['class'])) {
+                  $defaults['class'] = array_unique(array_merge($defaults['class'], $variables['classes_array']));
+                }
+                else {
+                  $defaults['class'] = $variables['classes_array'];
+                }
+              }
+            }
+            break;
+          case 'label':
+            if ($wrapper['options']['default_attrs'] && isset($variables['title_attributes_array'])) {
+              $defaults = $variables['title_attributes_array'];
+            }
+            break;
+          case 'content':
+            if ($wrapper['options']['default_attrs']) {
+              if (empty($variables['css_wrappers']['field']['elements'])) {
+                if (isset($variables['attributes_array'])) {
+                  $defaults = $variables['attributes_array'];
+                }
+                if (isset($variables['classes_array'])) {
+                  if (isset($defaults['class'])) {
+                    $defaults['class'] = array_unique(array_merge($defaults['class'], $variables['classes_array']));
+                  }
+                  else {
+                    $defaults['class'] = $variables['classes_array'];
+                  }
+                }
+              }
+              if (isset($variables['content_attributes_array'])) {
+                $defaults += $variables['content_attributes_array'];
+              }
+            }
+            break;
+          case 'item':
+            foreach ($variables['items'] as $delta => $item) {
+              if ($wrapper['options']['default_attrs'] && isset($variables['item_attributes_array'][$delta])) {
+                $defaults[$delta] = $variables['item_attributes_array'][$delta];
+              }
+              else {
+                $defaults[$delta] = array();
+              }
+            }
+            break;
+        }
+        if ($name !== 'item') {
+          foreach ($attributes as $attribute => $value) {
+            if (isset($defaults[$attribute]) && is_array($defaults[$attribute])) {
+              $defaults[$attribute] = array_unique(array_merge($value, $defaults[$attribute]));
+            }
+            else {
+              $defaults[$attribute] = $value;
+            }
+          }
+          if (empty($defaults)) {
+            $element['#attributes_processed'] = '';
+          }
+          else {
+            $element['#attributes_processed'] = drupal_attributes($defaults);
+          }
+        }
+        else {
+          foreach ($defaults as $delta => $item) {
+            foreach ($attributes as $attribute => $value) {
+              if (isset($defaults[$delta][$attribute])) {
+                $defaults[$delta][$attribute] = array_unique(array_merge($value, $defaults[$delta][$attribute]));
+              }
+              else {
+                $defaults[$delta][$attribute] = $value;
+              }
+            }
+            if (empty($defaults[$delta])) {
+              $element['#attributes_processed'][$delta] = '';
+            }
+            else {
+              $element['#attributes_processed'][$delta] = drupal_attributes($defaults[$delta]);
+            }
+          }
+        }
+        for ($i = 1; $i < count($wrapper['elements']); $i++) {
+          if (empty($wrapper['elements'][$i]['#attributes'])) {
+            $wrapper['elements'][$i]['#attributes_processed'] = '';
+          }
+          else {
+            $wrapper['elements'][$i]['#attributes_processed'] = drupal_attributes($wrapper['elements'][$i]['#attributes']);
+          }
+        }
+        $variables[$name . '_wrapper'] = $wrapper['elements'];
+      }
+      else {
+        $variables[$name . '_wrapper'] = array();
+      }
     }
+  }
 }
 
+
 /**
- * Implements theme_HOOK().
+ * Implements theme_hook().
  *
  * @param $variables
  * @return string
  */
 function theme_field_css_wrappers($variables) {
-    $output = '';
-    $items_rendered = '';
-    $item_wrapper = $variables['item_wrapper'];
-    $item_wrapper_empty = empty($item_wrapper);
-    foreach ($variables['items'] as $delta => $item) {
-        $item_prefix = $item_suffix = '';
-        if (!$item_wrapper_empty) {
-            unset($item_wrapper[0]['#attributes_processed']);
-            $item_wrapper[0]['#attributes_processed'] = $variables['item_wrapper'][0]['#attributes_processed'][$delta];
-        }
-        if (!empty($item['#prefix'])) {
-            $item_prefix = $item['#prefix'];
-            $item['#prefix'] = '';
-        }
-        if (!empty($item['#suffix'])) {
-            $item_suffix = $item['#suffix'];
-            $item['#suffix'] = '';
-        }
-        $items_rendered .= $item_prefix . _css_wrappers_build_wrapper_string($item_wrapper, $item) . $item_suffix;
+  $output = '';
+  $items_rendered = '';
+  $item_wrapper = $variables['item_wrapper'];
+  $item_wrapper_empty = empty($item_wrapper);
+  foreach ($variables['items'] as $delta => $item) {
+    $item_prefix = $item_suffix = '';
+    if (!$item_wrapper_empty) {
+      unset($item_wrapper[0]['#attributes_processed']);
+      $item_wrapper[0]['#attributes_processed'] = $variables['item_wrapper'][0]['#attributes_processed'][$delta];
     }
-    $output .= _css_wrappers_build_wrapper_string($variables['content_wrapper'], $items_rendered);
-    if ($output && !$variables['label_hidden']) {
-        $output = _css_wrappers_build_wrapper_string($variables['label_wrapper'], $variables['label']) . $output;
+    if (!empty($item['#prefix'])) {
+      $item_prefix = $item['#prefix'];
+      $item['#prefix'] = '';
     }
-    $output = _css_wrappers_build_wrapper_string($variables['field_wrapper'], $output);
-    return $output;
+    if (!empty($item['#suffix'])) {
+      $item_suffix = $item['#suffix'];
+      $item['#suffix'] = '';
+    }
+    $items_rendered .= $item_prefix . _css_wrappers_build_wrapper_string($item_wrapper, $item) . $item_suffix;
+  }
+  $output .= _css_wrappers_build_wrapper_string($variables['content_wrapper'], $items_rendered);
+  if ($output && !$variables['label_hidden']) {
+    $output = _css_wrappers_build_wrapper_string($variables['label_wrapper'], $variables['label']) . $output;
+  }
+  $output = _css_wrappers_build_wrapper_string($variables['field_wrapper'], $output);
+  return $output;
 }
+
 
 /**
  * Helper function that actually renders the content and its wrappers.
  *
  * @param array $wrappers An array representing nested HTML tags.
  * @param array $content The render array of the content being wrapped.
- * @param bool|enum $partial Pass in 'prefix' to return the only first half of the rendered $wrappers, and 'suffix' to return only the last half. FALSE (default) to return the wrapped content.
+ * @param bool|enum $partial Pass in 'prefix' to return the only first half of
+ * the rendered $wrappers, and 'suffix' to return only the last half. FALSE
+ * (default) to return the wrapped content.
  * @return string The rendered wrappers and/or content.
  */
 function _css_wrappers_build_wrapper_string($wrappers = array(), $content = array(), $partial = FALSE) {
-    $content_rendered = $partial ? TRUE : render($content);
-    if (!$content_rendered) {
-        return '';
+  if ($partial) {
+    $content_rendered = TRUE;
+  }
+  else {
+    $content_rendered = render($content);
+  }
+  if (!$content_rendered) {
+    return '';
+  }
+  if ($partial !== 'suffix') {
+    $prefix = '';
+    foreach ($wrappers as $wrapper) {
+      $prefix .= '<' . $wrapper['#tag'];
+      if (isset($wrapper['#attributes_processed']) {
+        $prefix .= $wrapper['#attributes_processed'];
+      }
+      else {
+        if (!empty($wrapper['#attributes']) {
+          $prefix .= drupal_attributes($wrapper['#attributes']);
+        }
+        else {
+          $prefix .= '';
+        }
+      }
+      $prefix .= '>';
     }
-    if ($partial !== 'suffix') {
-        $prefix = '';
-        foreach ($wrappers as $wrapper) {
-            $prefix .= '<' . $wrapper['#tag'] . (isset($wrapper['#attributes_processed']) ? $wrapper['#attributes_processed'] : (!empty($wrapper['#attributes']) ? drupal_attributes($wrapper['#attributes']) : ''))  . '>';
-        }
-        if ($partial == 'prefix') {
-            return $prefix;
-        }
+    if ($partial == 'prefix') {
+      return $prefix;
     }
-    if ($partial !== 'prefix') {
-        $suffix = '';
-        foreach (array_reverse($wrappers) as $wrapper) {
-            $suffix .= '</' . $wrapper['#tag'] . '>';
-        }
-        if ($partial == 'suffix') {
-            return $suffix;
-        }
+  }
+  if ($partial !== 'prefix') {
+    $suffix = '';
+    foreach (array_reverse($wrappers) as $wrapper) {
+      $suffix .= '</' . $wrapper['#tag'] . '>';
     }
-
-    return  $prefix . $content_rendered . $suffix;
+    if ($partial == 'suffix') {
+      return $suffix;
+    }
+  }
+  return  $prefix . $content_rendered . $suffix;
 }
+
 
 /**
  * Returns the opening half of the rendered string generated by _css_wrappers_build_wrapper_string().
@@ -171,8 +242,9 @@ function _css_wrappers_build_wrapper_string($wrappers = array(), $content = arra
  * @return string The rendered prefix.
  */
 function _css_wrappers_build_wrapper_prefix($wrappers = array()) {
-    return _css_wrappers_build_wrapper_string($wrappers, NULL, 'prefix');
+  return _css_wrappers_build_wrapper_string($wrappers, NULL, 'prefix');
 }
+
 
 /**
  * Returns the closing half of the rendered string generated by _css_wrappers_build_wrapper_string().
@@ -181,489 +253,597 @@ function _css_wrappers_build_wrapper_prefix($wrappers = array()) {
  * @return string
  */
 function _css_wrappers_build_wrapper_suffix($wrappers = array()) {
-    return _css_wrappers_build_wrapper_string($wrappers, NULL, 'suffix');
+  return _css_wrappers_build_wrapper_string($wrappers, NULL, 'suffix');
 }
 
-function css_wrappers_field_formatter_info_alter(&$info)
-{
-    $defaults = css_wrappers_inherit_defaults('field');
-    foreach ($info as &$item) {
-        $item['settings']['css_wrappers']['field'] = $defaults;
-    }
-}
 
 /**
- * Implements hook_form_FORM_ID_alter().
+ * Implements hook_field_formatter_info_alter().
+ */
+function css_wrappers_field_formatter_info_alter(&$info) {
+  $defaults = css_wrappers_inherit_defaults('field');
+  foreach ($info as &$item) {
+    $item['settings']['css_wrappers']['field'] = $defaults;
+  }
+}
+
+
+/**
+ * Implements hook_form_form_id_alter().
  */
 function css_wrappers_form_field_ui_display_overview_form_alter(&$form, $form_state) {
-    $form['#attached']['css'][] = drupal_get_path('module', 'css_wrappers').'/css_wrappers.admin.css';
+  $form['#attached']['css'][] = drupal_get_path('module', 'css_wrappers') . '/css_wrappers.admin.css';
 }
+
 
 /**
  * Implements hook_field_formatter_settings_summary_alter
  */
-function css_wrappers_field_formatter_settings_summary_alter(&$summary, array $context)
-{
-    $view_mode = $context['view_mode'];
-    $settings = css_wrappers_inherit($context['instance'] + array('view_mode' => $view_mode), 'field');
-    $status = array();
-    $inheritance = css_wrappers_group_inheritance('field');
-    foreach(css_wrappers_group_types('field') as $name => $data) {
-        if (isset($settings[$name])) {
-            $wrapper = $settings[$name];
-            $label = $data['label'];
-            $status[] =
-                '<dfn class="css-wrappers-dfn inheritance-' .  $wrapper['inheritance'] . '">' .
-                    $label[0] .
-                    '<div class="wrapper-info-wrap">' .
-                        '<span class="wrapper-info wrapper-type">' . $label . '</span>' .
-                        '<span class="wrapper-info wrapper-inheritance"> - ' . $inheritance[$wrapper['inheritance']] . '</span>' .
-                        '<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>' .
-                    '</div>' .
-                '</dfn>';
-        }
+function css_wrappers_field_formatter_settings_summary_alter(&$summary, array $context) {
+  $view_mode = $context['view_mode'];
+  $settings = css_wrappers_inherit($context['instance'] + array('view_mode' => $view_mode), 'field');
+  $status = array();
+  $inheritance = css_wrappers_group_inheritance('field');
+  foreach (css_wrappers_group_types('field') as $name => $data) {
+    if (isset($settings[$name])) {
+      $wrapper = $settings[$name];
+      $label = $data['label'];
+      $status[] =
+        '<dfn class="css-wrappers-dfn inheritance-' .  $wrapper['inheritance'] . '">' .
+          $label[0] .
+          '<div class="wrapper-info-wrap">' .
+            '<span class="wrapper-info wrapper-type">' . $label . '</span>' .
+            '<span class="wrapper-info wrapper-inheritance"> - ' . $inheritance[$wrapper['inheritance']] . '</span>' .
+            '<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>' .
+          '</div>' .
+        '</dfn>';
     }
-    $summary = !empty($summary) ? implode('', $status) . '<br/>' . $summary : implode('', $status);
+  }
+  if (!empty($summary)) {
+    $summary = implode('', $status) . '<br/>' . $summary;
+  }
+  else {
+    $summary = implode('', $status);
+  }
 }
+
 
 /**
  * Implements hook_field_formatter_settings_form_alter().
  */
-function css_wrappers_field_formatter_settings_form_alter(array &$form, array &$context)
-{
-    $field_ui_form = &$context['form'];
-    foreach($field_ui_form['#fields'] as $name) {
-        $field = &$field_ui_form['fields'][$name];
-        if (isset($field['format']['settings_edit_form']['actions']['save_settings'])) {
-            array_unshift($field['format']['settings_edit_form']['actions']['save_settings']['#submit'], 'css_wrappers_field_format_settings_form_submit');
-        }
+function css_wrappers_field_formatter_settings_form_alter(array &$form, array &$context) {
+  $field_ui_form = &$context['form'];
+  foreach ($field_ui_form['#fields'] as $name) {
+    $field = &$field_ui_form['fields'][$name];
+    if (isset($field['format']['settings_edit_form']['actions']['save_settings'])) {
+      array_unshift($field['format']['settings_edit_form']['actions']['save_settings']['#submit'], 'css_wrappers_field_format_settings_form_submit');
     }
-    $view_mode = $context['view_mode'];
-    $settings = css_wrappers_inherit($context['instance'] + array('view_mode' => $view_mode), 'field');
-    $fallbacks = css_wrappers_inherit($context['instance'] + array('view_mode' => $view_mode), 'field', array(), array('#invert', 'instance_view_current'));
-    $field_name = $context['field']['field_name'];
-    $edit = array(
-        'css_wrappers' => array(
-            '#tree' => TRUE,
-            '#type' => 'fieldset',
-            '#title' => t('CSS Field Wrappers'),
-            '#description' => t('To override the default wrappers for this field, check the box for the wrapper you wish to override and enter a valid CSS selector in the corresponding textfield.'),
-            '#collapsible' => TRUE,
-            '#collapsed' => TRUE,
-            'field' => array(
-                '#type' => 'container',
-            )
-        )
+  }
+  $view_mode = $context['view_mode'];
+  $settings = css_wrappers_inherit($context['instance'] + array('view_mode' => $view_mode), 'field');
+  $fallbacks = css_wrappers_inherit($context['instance'] + array('view_mode' => $view_mode), 'field', array(), array('#invert', 'instance_view_current'));
+  $field_name = $context['field']['field_name'];
+  $edit = array(
+    'css_wrappers' => array(
+      '#tree' => TRUE,
+      '#type' => 'fieldset',
+      '#title' => t('CSS Field Wrappers'),
+      '#description' => t('To override the default wrappers for this field, check the box for the wrapper you wish to override and enter a valid CSS selector in the corresponding textfield.'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      'field' => array(
+        '#type' => 'container',
+      ),
+    ),
+  );
+  foreach (css_wrappers_group_types('field') as $name => $type) {
+    $label = $type['label'];
+    $wrapper = $settings[$name];
+    if ($wrapper['inheritance'] === 'instance_view_current') {
+      $override = TRUE;
+    }
+    else {
+      $override = FALSE;
+    }
+    $fallback = $fallbacks[$name];
+    $edit['css_wrappers']['field'][$name] = array(
+      '#tree' => TRUE,
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('clearfix'),
+      ),
+      'enabled' => array(
+        '#type' => 'checkbox',
+        '#default_value' => $override,
+        '#prefix' => '<div class="css-wrapper-enabled">',
+        '#suffix' => '</div>',
+      ),
+      'default' => array(
+        '#type' => 'textfield',
+        '#title' => t($label),
+        '#maxlength' => 255,
+        '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
+        '#default_value' => $fallback['selector'],
+        '#field_name' => $field_name,
+        '#css_wrapper' => $name,
+        '#css_wrapper_group' => 'field',
+        '#disabled' => TRUE,
+        '#attributes' => array(
+          'placeholder' => t('No Wrapper'),
+        ),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+              'checked' => FALSE,
+            ),
+          ),
+        ),
+      ),
+      'default_options' => array(
+        '#type' => 'container',
+        '#prefix' => '<div class="css-wrappers-options">',
+        '#suffix' => '</div>',
+      ),
+      'selector' => array(
+        '#type' => 'textfield',
+        '#title' => t($label),
+        '#maxlength' => 255,
+        '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
+        '#default_value' => $wrapper['selector'],
+        '#element_validate' => array(
+          'css_wrappers_field_validate_process',
+        ),
+        '#field_name' => $field_name,
+        '#css_wrapper' => $name,
+        '#css_wrapper_group' => 'field',
+        '#attributes' => array(
+          'placeholder' => t('No Wrapper'),
+        ),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+              'checked' => TRUE,
+            ),
+          ),
+        ),
+      ),
+      'options' => array(
+        '#type' => 'container',
+        '#prefix' => '<div class="css-wrappers-options">',
+        '#suffix' => '</div>',
+      ),
     );
-    foreach(css_wrappers_group_types('field') as $name => $type) {
-        $label = $type['label'];
-        $wrapper = $settings[$name];
-        $override = ($wrapper['inheritance'] === 'instance_view_current') ? TRUE : FALSE;
-        $fallback = $fallbacks[$name];
-        $edit['css_wrappers']['field'][$name] = array(
-            '#tree' => TRUE,
-            '#type' => 'container',
-            '#attributes' => array(
-                'class' => array('clearfix'),
-            ),
-            'enabled' => array(
-                '#type' => 'checkbox',
-                '#default_value' => $override,
-                '#prefix' => '<div class="css-wrapper-enabled">',
-                '#suffix' => '</div>',
-            ),
-            'default' => array(
-                '#type' => 'textfield',
-                '#title' => t($label),
-                '#maxlength' => 255,
-                '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
-                '#default_value' => $fallback['selector'],
-                '#field_name' => $field_name,
-                '#css_wrapper' => $name,
-                '#css_wrapper_group' => 'field',
-                '#disabled' => TRUE,
-                '#attributes' => array(
-                    'placeholder' => t('No Wrapper'),
-                ),
-                '#states' => array(
-                    'visible' => array(
-                        ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => FALSE),
-                    )
-                ),
-            ),
-            'default_options' => array(
-                '#type' => 'container',
-                '#prefix' => '<div class="css-wrappers-options">',
-                '#suffix' => '</div>',
-            ),
-            'selector' => array(
-                '#type' => 'textfield',
-                '#title' => t($label),
-                '#maxlength' => 255,
-                '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
-                '#default_value' => $wrapper['selector'],
-                '#element_validate' => array('css_wrappers_field_validate_process'),
-                '#field_name' => $field_name,
-                '#css_wrapper' => $name,
-                '#css_wrapper_group' => 'field',
-                '#attributes' => array(
-                    'placeholder' => t('No Wrapper'),
-                ),
-                '#states' => array(
-                    'visible' => array(
-                        ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => TRUE),
-                    ),
-                ),
-            ),
-            'options' => array(
-                '#type' => 'container',
-                '#prefix' => '<div class="css-wrappers-options">',
-                '#suffix' => '</div>',
+    foreach (css_wrappers_type_default_options('field', $name) as $option => $data) {
+      $edit['css_wrappers']['field'][$name]['default_options'][$option] = array(
+          '#disabled' => TRUE,
+          '#default_value' => $fallback['options'][$option],
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+                'checked' => FALSE,
+              ),
             )
-        );
-        foreach (css_wrappers_type_default_options('field', $name) as $option => $data) {
-            $edit['css_wrappers']['field'][$name]['default_options'][$option] = array(
-                    '#disabled' => TRUE,
-                    '#default_value' => $fallback['options'][$option],
-                    '#states' => array(
-                        'visible' => array(
-                            ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => FALSE),
-                        )
-                    ),
-                ) + $data;
-            $edit['css_wrappers']['field'][$name]['options'][$option] = array(
-                    '#default_value' => $wrapper['options'][$option],
-                    '#states' => array(
-                        'visible' => array(
-                            ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => TRUE),
-                        ),
-                    ),
-                ) + $data;
-        }
+          ),
+        ) + $data;
+      $edit['css_wrappers']['field'][$name]['options'][$option] = array(
+          '#default_value' => $wrapper['options'][$option],
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $field_name .'][settings_edit_form][settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+                'checked' => TRUE,
+              ),
+            ),
+          ),
+        ) + $data;
     }
-    $form = $edit + $form;
+  }
+  $form = $edit + $form;
 }
+
 
 /**
- * Callback for element_validate. Validates changes made to the wrapper selectors for a field and prepares the wrappers themselves for submission.
+ * Callback for element_validate. Validates changes made to the wrapper selectors
+ * for a field and prepares the wrappers themselves for submission.
  */
 function css_wrappers_field_validate_process(&$element, &$form_state, &$form) {
-
-    $name = $element['#css_wrapper'];
-    $group = $element['#css_wrapper_group'];
-    $editing = $form_state['formatter_settings_edit'];
-    $type = &$form_state['values']['fields'][$editing]['settings_edit_form']['settings']['css_wrappers'][$group][$name];
-    unset($type['default'], $type['default_options']);
-    $valid = css_wrappers_form_selector_validate($element, $form_state, $form);
-    if ($valid) {
-
-        if (!empty($type['selector'])) {
-            $processed = css_wrappers_from_css_selector($type['selector']);
-            if ($processed['selector'] && $processed['elements']) {
-                $type['selector'] = $processed['selector'];
-                $type['elements'] = $processed['elements'];
-            }
-        } else {
-            $type['selector'] = '';
-            $type['elements'] = array();
-        }
+  $name = $element['#css_wrapper'];
+  $group = $element['#css_wrapper_group'];
+  $editing = $form_state['formatter_settings_edit'];
+  $type = &$form_state['values']['fields'][$editing]['settings_edit_form']['settings']['css_wrappers'][$group][$name];
+  unset($type['default'], $type['default_options']);
+  $valid = css_wrappers_form_selector_validate($element, $form_state, $form);
+  if ($valid) {
+    if (!empty($type['selector'])) {
+      $processed = css_wrappers_from_css_selector($type['selector']);
+      if ($processed['selector'] && $processed['elements']) {
+        $type['selector'] = $processed['selector'];
+        $type['elements'] = $processed['elements'];
+      }
     }
+    else {
+      $type['selector'] = '';
+      $type['elements'] = array();
+    }
+  }
 }
+
 
 /**
  * Simply determines whether or not the selector submitted in the form is valid.
  */
 function css_wrappers_form_selector_validate(&$element, &$form_state, &$form) {
-    if (!empty($element['#value'])) {
-        $valid = css_wrappers_from_css_selector($element['#value'], TRUE);
-        if (!$valid) {
-            form_error($element, t("The " . $element['#title'] . " specified appears to be invalid. Please check your syntax."));
-            return FALSE;
-        }
+  if (!empty($element['#value'])) {
+    $valid = css_wrappers_from_css_selector($element['#value'], TRUE);
+    if (!$valid) {
+      form_error($element, t("The " . $element['#title'] . " specified appears to be invalid. Please check your syntax."));
+      return FALSE;
     }
-    return TRUE;
+  }
+  return TRUE;
 }
 
+
 /**
- * Validates a selector string and (optionally, but by default) returns an array of tags and attributes.
+ * Validates a selector string and (optionally, but by default) returns an array
+ * of tags and attributes.
  *
  * @param string $selector A simple CSS selector string
- * @param bool $validate If FALSE (default), a valid selector string will return the tag/attribute array, if TRUE, a boolean representing the validity of the selector will be returned.
- * @return array|bool FALSE if the selector is invalid, TRUE if valid and $validate is TRUE, tag/attribute array if valid and $validate is FALSE
+ * @param bool $validate If FALSE (default), a valid selector string will return
+ * the tag/attribute array, if TRUE, a boolean representing the validity of the
+ * selector will be returned.
+ * @return array|bool FALSE if the selector is invalid, TRUE if valid and
+ * $validate is TRUE, tag/attribute array if valid and $validate is FALSE
  */
 function css_wrappers_from_css_selector($selector = '', $validate = FALSE) {
-    $return = array('selector' => '', 'elements' => array());
-    $selectors = array();
-    $capture_patterns = array(
-        'attributes' => '\[([a-zA-Z][a-zA-Z0-9\-_]*?)=(?:"|\')(.*?)(?:"|\')\]',
-        'class' => '\.([a-zA-Z][a-zA-Z0-9-_]+)',
-        'id' => '#([a-zA-Z][a-zA-Z0-9-_]+)',
-        'tag' => '(?:^|\s)([a-zA-Z][a-zA-Z0-9]*)',
-    );
-    $replace_patterns = array(
-        'attributes' => array(),
-        'class' => array(),
-        'id' => array(),
-        'tag' => array(),
-    );
-    if ($validate) {
-        $global_pattern = "/^(([\\s+>~]*)?({$capture_patterns['tag']}(({$capture_patterns['class']})|({$capture_patterns['id']})|({$capture_patterns['attributes']}))*)([\\s+>~]*)?)*$/";
-        $matched = preg_match($global_pattern, $selector);
-        return  $matched ? TRUE : FALSE;
+  $return = array('selector' => '', 'elements' => array());
+  $selectors = array();
+  $capture_patterns = array(
+    'attributes' => '\[([a-zA-Z][a-zA-Z0-9\-_]*?)=(?:"|\')(.*?)(?:"|\')\]',
+    'class' => '\.([a-zA-Z][a-zA-Z0-9-_]+)',
+    'id' => '#([a-zA-Z][a-zA-Z0-9-_]+)',
+    'tag' => '(?:^|\s)([a-zA-Z][a-zA-Z0-9]*)',
+  );
+  $replace_patterns = array(
+    'attributes' => array(),
+    'class' => array(),
+    'id' => array(),
+    'tag' => array(),
+  );
+  if ($validate) {
+    $global_pattern = "/^(([\\s+>~]*)?({$capture_patterns['tag']}(({$capture_patterns['class']})|({$capture_patterns['id']})|({$capture_patterns['attributes']}))*)([\\s+>~]*)?)*$/";
+    $matched = preg_match($global_pattern, $selector);
+    if ($matched) {
+      return TRUE;
     }
-    $global_pattern = "/{$capture_patterns['tag']}(({$capture_patterns['class']})|({$capture_patterns['id']})|({$capture_patterns['attributes']}))*/";
-    $global_matched = preg_match_all($global_pattern, $selector, $global_matches, PREG_PATTERN_ORDER);
-
-    if ($global_matched) {
-        foreach ($global_matches[0] as $global_match) {
-            $element = array();
-            $selector = array();
-            foreach ($capture_patterns as $key => $pattern) {
-                $section = '';
-                $capture_matched = preg_match_all('/'.$pattern.'/', $global_match, $capture_matches, PREG_SET_ORDER);
-                if ($capture_matched) {
-                    foreach($capture_matches as $capture_match) {
-
-                        switch ($key) {
-                            case 'attributes':
-                                if (!in_array($capture_match[1], array('id', 'class'))) {
-                                    $element['#attributes'][$capture_match[1]][] = $item = $capture_match[2];
-                                } else {
-                                    continue;
-                                }
-                                break;
-                            case 'class':
-                                if (!isset($element['#attributes'][$key]) || !in_array($capture_match[1], $element['#attributes'][$key])) {
-                                    $element['#attributes'][$key][] = $item = $capture_match[1];
-                                } else {
-                                    continue;
-                                }
-                                break;
-                            case 'id':
-                                if (!isset($element['#attributes'][$key])) {
-                                    $element['#attributes'][$key][] = $item = $capture_match[1];
-                                } else {
-                                    continue;
-                                }
-                                break;
-                            case 'tag':
-                                if (!isset($element['#tag'])) {
-                                    $element['#tag'] = $item = $capture_match[1];
-                                }
-                                else {
-                                    continue;
-                                }
-                                break;
-                            default:
-                                continue;
-                        }
-                        if (isset($item) && isset($replace_patterns[$key])) {
-                            foreach($replace_patterns[$key] as $search => $replace) {
-                                $item = preg_replace($search, $replace, $item);
-                            }
-                        }
-                        $global_match = str_replace($capture_match[0], '', $global_match);
-                        $section .= trim($capture_match[0]);
-                    }
+    else {
+      return FALSE;
+    }
+  }
+  $global_pattern = "/{$capture_patterns['tag']}(({$capture_patterns['class']})|({$capture_patterns['id']})|({$capture_patterns['attributes']}))*/";
+  $global_matched = preg_match_all($global_pattern, $selector, $global_matches, PREG_PATTERN_ORDER);
+  if ($global_matched) {
+    foreach ($global_matches[0] as $global_match) {
+      $element = array();
+      $selector = array();
+      foreach ($capture_patterns as $key => $pattern) {
+        $section = '';
+        $capture_matched = preg_match_all('/' . $pattern . '/', $global_match, $capture_matches, PREG_SET_ORDER);
+        if ($capture_matched) {
+          foreach ($capture_matches as $capture_match) {
+            switch ($key) {
+              case 'attributes':
+                if (!in_array($capture_match[1], array('id', 'class'))) {
+                  $element['#attributes'][$capture_match[1]][] = $item = $capture_match[2];
                 }
-                array_unshift($selector, $section);
+                else {
+                  continue;
+                }
+                break;
+              case 'class':
+                if (!isset($element['#attributes'][$key]) || !in_array($capture_match[1], $element['#attributes'][$key])) {
+                  $element['#attributes'][$key][] = $item = $capture_match[1];
+                }
+                else {
+                  continue;
+                }
+                break;
+              case 'id':
+                if (!isset($element['#attributes'][$key])) {
+                  $element['#attributes'][$key][] = $item = $capture_match[1];
+                }
+                else {
+                  continue;
+                }
+                break;
+              case 'tag':
+                if (!isset($element['#tag'])) {
+                  $element['#tag'] = $item = $capture_match[1];
+                }
+                else {
+                  continue;
+                }
+                break;
+              default:
+                continue;
             }
-            $selectors[] = implode('', $selector);
-            $return['elements'][] = $element;
+            if (isset($item) && isset($replace_patterns[$key])) {
+              foreach ($replace_patterns[$key] as $search => $replace) {
+                $item = preg_replace($search, $replace, $item);
+              }
+            }
+            $global_match = str_replace($capture_match[0], '', $global_match);
+            $section .= trim($capture_match[0]);
+          }
         }
+        array_unshift($selector, $section);
+      }
+      $selectors[] = implode('', $selector);
+      $return['elements'][] = $element;
     }
-    $return['selector'] = implode(' > ', $selectors);
-    return $return;
+  }
+  $return['selector'] = implode(' > ', $selectors);
+  return $return;
 }
 
+
 /**
- * Searches for wrapper groups defined by other modules. @see css_wrappers_css_wrappers_info().
+ * Searches for wrapper groups defined by other modules.
+ * @see css_wrappers_css_wrappers_info().
+ *
  * @return array The array of wrapper group definitions.
  */
 function css_wrappers_info() {
-    static $drupal_static_fast;
-    if (!isset($drupal_static_fast)) {
-        $drupal_static_fast['css_wrappers_info'] = &drupal_static(__FUNCTION__);
+  static $drupal_static_fast;
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['css_wrappers_info'] = &drupal_static(__FUNCTION__);
+  }
+  $sets = &$drupal_static_fast['css_wrappers_info'];
+  if (!isset($sets)) {
+    if ($cache = cache_get('css_wrappers_info')) {
+      $sets = $cache->data;
     }
-    $sets = &$drupal_static_fast['css_wrappers_info'];
-    if (!isset($sets)) {
-        if ($cache = cache_get('css_wrappers_info')) {
-            $sets = $cache->data;
+    else {
+      $sets = array(
+        '#sets' => array(),
+        '#types' => array(),
+        '#inheritance' => array(),
+      );
+      $info = module_invoke_all('css_wrappers_info');
+      drupal_alter('css_wrappers_info', $info);
+      foreach ($info as $name => $set) {
+        if (isset($sets[$name])) {
+          continue;
+        }
+        $sets[$name] = array();
+        drupal_alter(array('css_wrapper_group_info', 'css_wrapper_group_info' . $name), $set, $name);
+        if (!empty($set['label'])) {
+          $sets[$name]['label'] = check_plain($set['label']);
         }
         else {
-            $sets = array(
-                '#sets' => array(),
-                '#types' => array(),
-                '#inheritance' => array(),
-            );
-            $info = module_invoke_all('css_wrappers_info');
-            drupal_alter('css_wrappers_info', $info);
-            foreach ($info as $name => $set) {
-                if (isset($sets[$name])) {
-                    continue;
-                }
-                $sets[$name] = array();
-                drupal_alter(array('css_wrapper_group_info', 'css_wrapper_group_info' . $name), $set, $name);
-                $sets[$name]['label'] = !empty($set['label']) ? check_plain($set['label']) : t('Unnamed set: ' . check_plain($name));
-                $sets['#groups'][$name] = $sets[$name]['label'];
-                $options = isset($set['options']) ? $set['options'] : array();
-                drupal_alter(array('css_wrapper_group_options', 'css_wrapper_group_options_' . $name), $options, $name);
-                $sets[$name]['options'] = $options;
-                $inheritance = isset($set['inheritance']) ? $set['inheritance'] : array();
-                drupal_alter(array('css_wrapper_inheritance', 'css_wrapper_inheritance_' . $name), $inheritance, $name);
-                foreach ($inheritance as $function => $label) {
-                    $sets['#inheritance'][$function][$name] = $inheritance[$function];
-                }
-                $sets[$name]['inheritance'] = $inheritance;
-                $types = isset($set['types']) ? $set['types'] : array();
-                drupal_alter(array('css_wrapper_types', 'css_wrapper_types_' . $name), $types, $name);
-                foreach ($types as $type => $wrapper) {
-                    $type = check_plain($type);
-                    $wrapper['options'] = isset($wrapper['options']) ? $wrapper['options'] + $options : $options;
-                    $selector = '';
-                    $elements = array();
-                    $wrapper['label'] = !empty($wrapper['label']) ? check_plain($wrapper['label']) : t('Unnamed wrapper: ' . check_plain($type));
-                    if (!empty($wrapper['selector'])) {
-                        $processed = css_wrappers_from_css_selector($wrapper['selector']);
-                        if (!$processed || empty($processed['selector']) || empty($processed['elements'])) {
-                            continue;
-                        }
-                        else {
-                            $elements = $processed['elements'];
-                            $selector = $processed['selector'];
-                        }
-                    }
-                    $sets[$name]['types'][$type] = array(
-                        'label' => $wrapper['label'],
-                        'enabled' => isset($wrapper['enabled']) && $wrapper['enabled'] ? TRUE : FALSE,
-                        'selector' => $selector,
-                        'elements' => $elements,
-                        'options' => $wrapper['options'],
-                    );
-                    $sets['#types'][$type][$name] = $wrapper['label'];
-                }
-            }
-            cache_set('css_wrappers_info', $sets);
+          $sets[$name]['label'] = t('Unnamed set: ' . check_plain($name));
         }
+        $sets['#groups'][$name] = $sets[$name]['label'];
+        if (isset($set['options'])) {
+          $options = $set['options'];
+        }
+        else {
+          $options = array();
+        }
+        drupal_alter(array('css_wrapper_group_options', 'css_wrapper_group_options_' . $name), $options, $name);
+        $sets[$name]['options'] = $options;
+        if (isset($set['inheritance'])) {
+          $inheritance = $set['inheritance'];
+        }
+        else {
+          $inheritance = array();
+        }
+        drupal_alter(array('css_wrapper_inheritance', 'css_wrapper_inheritance_' . $name), $inheritance, $name);
+        foreach ($inheritance as $function => $label) {
+          $sets['#inheritance'][$function][$name] = $inheritance[$function];
+        }
+        $sets[$name]['inheritance'] = $inheritance;
+        if (isset($set['types'])) {
+          $types = $set['types'];
+        }
+        else {
+          $types = array();
+        }
+        drupal_alter(array('css_wrapper_types', 'css_wrapper_types_' . $name), $types, $name);
+        foreach ($types as $type => $wrapper) {
+          $type = check_plain($type);
+          if (isset($wrapper['options'])) {
+            $wrapper['options'] = $wrapper['options'] + $options;
+          }
+          else {
+            $wrapper['options'] = $options;
+          }
+          $selector = '';
+          $elements = array();
+          if (!empty($wrapper['label'])) {
+            $wrapper['label'] = check_plain($wrapper['label']);
+          }
+          else {
+            $wrapper['label'] = t('Unnamed wrapper: ' . check_plain($type));
+          }
+          if (!empty($wrapper['selector'])) {
+            $processed = css_wrappers_from_css_selector($wrapper['selector']);
+            if (!$processed || empty($processed['selector']) || empty($processed['elements'])) {
+              continue;
+            }
+            else {
+              $elements = $processed['elements'];
+              $selector = $processed['selector'];
+            }
+          }
+          if (isset($wrapper['enabled']) && $wrapper['enabled']) {
+            $enabled = TRUE;
+          }
+          else {
+            $enabled = FALSE;
+          }
+          $sets[$name]['types'][$type] = array(
+            'label' => $wrapper['label'],
+            'enabled' => $enabled,
+            'selector' => $selector,
+            'elements' => $elements,
+            'options' => $wrapper['options'],
+          );
+          $sets['#types'][$type][$name] = $wrapper['label'];
+        }
+      }
+      cache_set('css_wrappers_info', $sets);
     }
-    return $sets;
+  }
+  return $sets;
 }
+
 
 /**
  * Implements hook_css_wrappers_info().
  */
-function css_wrappers_css_wrappers_info()
-{
-    return array(
-        'field' => array(
-            'label' => t('Field Wrappers'),
-            'options' => array(
-                'default_attrs' => array(
-                    '#type' => 'checkbox',
-                    '#title' => t('Include default attributes'),
-                    '#default_value' => TRUE,
-                ),
-            ),
-            'inheritance' => array(
-                'instance_view_current' => t('Applied to instance at current view mode.'),
-                'instance_view_default' => t('Inherited from instance at default view mode.'),
-            ),
-            'types' => array(
-                'field' => array(
-                    'label' => t('Field Wrapper'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD,
-                ),
-                'label' => array(
-                    'label' => t('Label Wrapper'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_LABEL,
-                ),
-                'content' => array(
-                    'label' => t('Content Wrapper'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_CONTENT,
-                ),
-                'item' => array(
-                    'label' => t('Item Wrapper'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_ITEM,
-                ),
-            ),
+function css_wrappers_css_wrappers_info() {
+  return array(
+    'field' => array(
+      'label' => t('Field Wrappers'),
+      'options' => array(
+        'default_attrs' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Include default attributes'),
+          '#default_value' => TRUE,
         ),
-    );
+      ),
+      'inheritance' => array(
+        'instance_view_current' => t('Applied to instance at current view mode.'),
+        'instance_view_default' => t('Inherited from instance at default view mode.'),
+      ),
+      'types' => array(
+        'field' => array(
+          'label' => t('Field Wrapper'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD,
+        ),
+        'label' => array(
+          'label' => t('Label Wrapper'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_LABEL,
+        ),
+        'content' => array(
+          'label' => t('Content Wrapper'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_CONTENT,
+        ),
+        'item' => array(
+          'label' => t('Item Wrapper'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_ITEM,
+        ),
+      ),
+    ),
+  );
 }
 
+
 /**
- * Returns the default settings for a wrapper group, optionally filtered to a type within that group.
+ * Returns the default settings for a wrapper group, optionally filtered
+ * to a type within that group.
  *
  * @param string $group The name of a wrapper group.
  * @param bool $type The (optional) type defined by the group to extract.
- * @return array The default settings for all types in the group, or the specific type if $type is not FALSE.
+ * @return array The default settings for all types in the group, or the
+ * specific type if $type is not FALSE.
  */
 function css_wrappers_inherit_defaults($group, $type = FALSE) {
-    $default_types = css_wrappers_group_types($group);
-    if (!$type) {
-        $types = array_keys($default_types);
-    } else {
-        $types = is_array($type) ? $type : array($type);
+  $default_types = css_wrappers_group_types($group);
+  if (!$type) {
+    $types = array_keys($default_types);
+  }
+  else {
+    if (is_array($type)) {
+      $types = $type;
     }
-    $return = array();
-    foreach($types as $type) {
-        $return[$type] = array();
-        if (isset($default_types[$type])) {
-            $wrapper = $default_types[$type];
-            $return[$type]['inheritance'] = 'system_default';
-            $return[$type]['enabled'] = $wrapper['enabled'];
-            $return[$type]['selector'] = $wrapper['selector'];
-            $return[$type]['elements'] = $wrapper['elements'];
-            foreach ($wrapper['options'] as $option => $data) {
-                if (isset($data['#default_value'])) {
-                    $return[$type]['options'][$option] = $data['#default_value'];
-                }
-            }
+    else {
+      $types = array($type);
+    }
+  }
+  $return = array();
+  foreach ($types as $type) {
+    $return[$type] = array();
+    if (isset($default_types[$type])) {
+      $wrapper = $default_types[$type];
+      $return[$type]['inheritance'] = 'system_default';
+      $return[$type]['enabled'] = $wrapper['enabled'];
+      $return[$type]['selector'] = $wrapper['selector'];
+      $return[$type]['elements'] = $wrapper['elements'];
+      foreach ($wrapper['options'] as $option => $data) {
+        if (isset($data['#default_value'])) {
+          $return[$type]['options'][$option] = $data['#default_value'];
         }
+      }
     }
-    return $return;
+  }
+  return $return;
 }
+
 
 /**
  * Returns the wrapper type definitions for the requested wrapper group.
  *
  * @param string $group The name of a wrapper group.
  * @param bool $keys If TRUE, only the type names will be returned.
- * @return array The typ setting definitions or names, depending on the value of $keys.
+ * @return array The typ setting definitions or names, depending on the value
+ * of $keys.
  */
 function css_wrappers_group_types($group, $keys = FALSE) {
-    $info = css_wrappers_info();
-    return isset($info[$group]['types']) ? ($keys ? array_keys($info[$group]['types']) : $info[$group]['types']) : array();
+  $info = css_wrappers_info();
+  if (isset($info[$group]['types'])) {
+    if ($keys) {
+      return array_keys($info[$group]['types']);
+    }
+    else {
+      return $info[$group]['types'];
+    }
+  }
+  else {
+    return array();
+  }
 }
 
+
 /**
- * Returns the inheritance chain for a wrapper group as an array of testing function names and descriptions.
+ * Returns the inheritance chain for a wrapper group as an array of testing
+ * function names and descriptions.
  * @param string $group The name of a wrapper group
  * @param bool $keys If TRUE, only the function names will be returned.
- * @return array The testing function names and descriptions of each inheritance level for the group.
+ * @return array The testing function names and descriptions of each inheritance
+ * level for the group.
  */
 function css_wrappers_group_inheritance($group, $keys = FALSE) {
-    $info = css_wrappers_info();
-    $return = array();
-    if (isset($info[$group]['inheritance'])) {
-        $return = $info[$group]['inheritance'];
-        $return['system_default'] = t('Inherited from system defaults');
-        if ($keys) {
-            $return = array_keys($return);
-        }
+  $info = css_wrappers_info();
+  $return = array();
+  if (isset($info[$group]['inheritance'])) {
+    $return = $info[$group]['inheritance'];
+    $return['system_default'] = t('Inherited from system defaults');
+    if ($keys) {
+      $return = array_keys($return);
     }
-    return $return;
+  }
+  return $return;
 }
 
+
 /**
- * Returns the non-selector option defaults for a wrapper group. @TODO combine this with css_wrappers_type_default_options.
+ * Returns the non-selector option defaults for a wrapper group.
+ * @TODO combine this with css_wrappers_type_default_options.
  *
  * @param string $group The name of a wrapper group
  * @return array The non-selector options for the group.
  */
 function css_wrappers_group_default_options($group) {
-    $info = css_wrappers_info();
-    return isset($info[$group]['options']) ? $info[$group]['options'] : array();
+  $info = css_wrappers_info();
+  if (isset($info[$group]['options'])) {
+    return $info[$group]['options'];
+  }
+  else {
+    return array();
+  }
 }
+
 
 /**
  * Returns the non-selector option defaults for a specific type within a wrapper group.
@@ -673,10 +853,15 @@ function css_wrappers_group_default_options($group) {
  * @return array The non-selector options for the type.
  */
 function css_wrappers_type_default_options($group, $type) {
-    $info = css_wrappers_info();
-    $return = isset($info[$group]['types'][$type]['options']) ? $info[$group]['types'][$type]['options'] : array();
-    return $return;
+  $info = css_wrappers_info();
+  if (isset($info[$group]['types'][$type]['options'])) {
+    return $info[$group]['types'][$type]['options']
+  }
+  else {
+    return array();
+  }
 }
+
 
 /**
  * Returns the default selector for a specific wrapper type.
@@ -684,13 +869,20 @@ function css_wrappers_type_default_options($group, $type) {
  * @return string The default selector for the type.
  */
 function css_wrappers_type_default_selector($type) {
-    if (!empty($info['#types'][$type])) {
-        $group = reset(array_keys($info['#types'][$type]));
-        return isset($info[$group]['types'][$type]['selector']) ? $info[$group]['types'][$type]['selector'] : '';
-    } else {
-        return '';
+  if (!empty($info['#types'][$type])) {
+    $group = reset(array_keys($info['#types'][$type]));
+    if (isset($info[$group]['types'][$type]['selector'])) {
+      return $info[$group]['types'][$type]['selector'];
     }
+    else {
+      return '';
+    }
+  }
+  else {
+    return '';
+  }
 }
+
 
 /**
  * Returns the default array of wrapper elements (tags/attributes) for a wrapper type.
@@ -698,74 +890,90 @@ function css_wrappers_type_default_selector($type) {
  * @return array the default wrapper elements array for the type.
  */
 function css_wrappers_type_default_elements($type) {
-    if (!empty($info['#types'][$type])) {
-        $group = reset(array_keys($info['#types'][$type]));
-        return isset($info[$group]['types'][$type]['elements']) ? $info[$group]['types'][$type]['elements'] : array();
-    } else {
-        return array();
+  if (!empty($info['#types'][$type])) {
+    $group = reset(array_keys($info['#types'][$type]));
+    if (isset($info[$group]['types'][$type]['elements'])) {
+      return $info[$group]['types'][$type]['elements'];
     }
+    else {
+      return array();
+    }
+  }
+  else {
+    return array();
+  }
 }
 
 /**
- * Cycles through an item's inheritance chain to determine which wrappers should be applied.
- * @param array|object $data A collection of identifying information about the item that can be used to calculate its inheritance.
+ * Cycles through an item's inheritance chain to determine which wrappers
+ * should be applied.
+ * @param array|object $data A collection of identifying information about the
+ * item that can be used to calculate its inheritance.
  * @param string $group The name of a wrapper group.
- * @param array $filter_types An (optional) array of wrapper type names to test OR exclude of '#invert' is contained as a value.
- * @param array $filter_inheritance An (optional) array of inheritance testing functions to use OR exclude of '#invert' is contained as a value.
+ * @param array $filter_types An (optional) array of wrapper type names to test
+ * OR exclude of '#invert' is contained as a value.
+ * @param array $filter_inheritance An (optional) array of inheritance testing
+ * functions to use OR exclude of '#invert' is contained as a value.
  * @return array The inherited settings for the item.
  */
 function css_wrappers_inherit($data, $group, $filter_types = array(), $filter_inheritance = array()) {
-    $defaults = css_wrappers_inherit_defaults($group);
-    $group_inheritance =  css_wrappers_group_inheritance($group, TRUE);
-    $group_types = css_wrappers_group_types($group, TRUE);
-    $inheritance = $types = array();
-    $inheritance_filtered = !empty($filter_inheritance);
-    $types_filtered = !empty($filter_types);
-    $inheritance_inverted = in_array('#invert', $filter_inheritance);
-    $types_inverted = in_array('#invert', $filter_types);
-    $wrappers = array();
-    foreach ($group_inheritance as $level) {
-        if ((!$inheritance_filtered || (in_array($level, $filter_inheritance) || ($inheritance_inverted && !in_array($level, $filter_inheritance)))) && function_exists('css_wrappers_inherit_' . $level)) {
-            $inheritance[] = $level;
-        }
+  $defaults = css_wrappers_inherit_defaults($group);
+  $group_inheritance =  css_wrappers_group_inheritance($group, TRUE);
+  $group_types = css_wrappers_group_types($group, TRUE);
+  $inheritance = $types = array();
+  $inheritance_filtered = !empty($filter_inheritance);
+  $types_filtered = !empty($filter_types);
+  $inheritance_inverted = in_array('#invert', $filter_inheritance);
+  $types_inverted = in_array('#invert', $filter_types);
+  $wrappers = array();
+  foreach ($group_inheritance as $level) {
+    if ((!$inheritance_filtered || (in_array($level, $filter_inheritance) || ($inheritance_inverted && !in_array($level, $filter_inheritance)))) && function_exists('css_wrappers_inherit_' . $level)) {
+      $inheritance[] = $level;
     }
-    foreach ($group_types as $type) {
-        if (!$types_filtered || (in_array($type, $filter_types) || ($types_inverted && !in_array($type, $filter_types)))) {
-            $types[] = $type;
-        }
+  }
+  foreach ($group_types as $type) {
+    if (!$types_filtered || (in_array($type, $filter_types) || ($types_inverted && !in_array($type, $filter_types)))) {
+      $types[] = $type;
     }
-    foreach ($types as $type) {
-        foreach ($inheritance as $level) {
-            $function = 'css_wrappers_inherit_' . $level;
-            $result = $function($data, $group, $type);
-            if (!empty($result)) {
-                $wrappers[$type] = array('inheritance' => $level) + $result;
-                break;
-            }
-        }
-        if (!isset($wrappers[$type])) {
-            $wrappers[$type] = $defaults[$type];
-        }
+  }
+  foreach ($types as $type) {
+    foreach ($inheritance as $level) {
+      $function = 'css_wrappers_inherit_' . $level;
+      $result = $function($data, $group, $type);
+      if (!empty($result)) {
+        $wrappers[$type] = array('inheritance' => $level) + $result;
+        break;
+      }
     }
-    return $wrappers;
+    if (!isset($wrappers[$type])) {
+      $wrappers[$type] = $defaults[$type];
+    }
+  }
+  return $wrappers;
 }
 
+
 /**
- * Implements css_wrappers_inherit_HOOK();
+ * Implements css_wrappers_inherit_hook();
  *
- * @param array|object $data The collection of identifying data passed in by css_wrappers_inherit().
+ * @param array|object $data The collection of identifying data passed in by
+ * css_wrappers_inherit().
  * @param string $group The group name passed in by css_wrappers_inherit().
  * @param string $type The type name passed in by css_wrappers_inherit().
  * @return mixed An array of settings for the object, if inheritance applies.
  */
-
 function css_wrappers_inherit_instance_view_current($data, $group, $type) {
-    $view_mode = $data['view_mode'];
-    if (isset($data['display'][$view_mode], $data['display'][$view_mode]['settings']['css_wrappers']) && $data['display'][$view_mode]['settings']['css_wrappers'][$group][$type]['enabled']) {
-        return $data['display'][$view_mode]['settings']['css_wrappers'][$group][$type];
-    }
+  $view_mode = $data['view_mode'];
+  if (isset($data['display'][$view_mode], $data['display'][$view_mode]['settings']['css_wrappers']) && $data['display'][$view_mode]['settings']['css_wrappers'][$group][$type]['enabled']) {
+    return $data['display'][$view_mode]['settings']['css_wrappers'][$group][$type];
+  }
 }
+
+
+/**
+ * Implements css_wrappers_inherit_hook();
+ */
 function css_wrappers_inherit_instance_view_default($data, $group, $type) {
-    $data['view_mode'] = 'default';
-    return css_wrappers_inherit_instance_view_current($data, $group, $type);
+  $data['view_mode'] = 'default';
+  return css_wrappers_inherit_instance_view_current($data, $group, $type);
 }
