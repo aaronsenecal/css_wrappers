@@ -3,430 +3,465 @@ define('CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP', 'div.field-group-wrapper');
 define('CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP_LABEL', 'div.field-group-label-wrapper');
 define('CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP_CONTENT', 'div.field-group-content-wrapper');
 
+
 function css_wrappers_field_group_css_wrappers_info() {
-    return array(
-        'field_group' => array(
-            'label' => t('Field Group Wrappers'),
-            'inheritance' => array(
-                'group_direct' => t('Applied directly to this field group'),
-                'group_parent' => t('Inherited from a containing Field Group'),
+  return array(
+    'field_group' => array(
+      'label' => t('Field Group Wrappers'),
+      'inheritance' => array(
+        'group_direct' => t('Applied directly to this field group'),
+        'group_parent' => t('Inherited from a containing Field Group'),
+      ),
+      'types' => array(
+        'group' => array(
+          'label' => t('Field Group Wrapper'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP,
+          'options' => array(
+            'default_attrs' => array(
+              '#type' => 'checkbox',
+              '#default_value' => TRUE,
+              '#title' => t('Include default attributes'),
             ),
-            'types' => array(
-                'group' => array(
-                    'label' => t('Field Group Wrapper'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP,
-                    'options' => array(
-                        'default_attrs' => array(
-                            '#type' => 'checkbox',
-                            '#default_value' => TRUE,
-                            '#title' => t('Include default attributes'),
-                        ),
-                    )
-                ),
-                'group_label' => array(
-                    'label' => t('Label Wrapper for Field Group'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP_LABEL,
-                    'options' => array(
-                        'show_label' => array(
-                            '#type' => 'checkbox',
-                            '#default_value' => TRUE,
-                            '#title' => t('Show field group label'),
-                        ),
-                    )
-                ),
-                'group_content' => array(
-                    'label' => t('Content Wrapper for Field Group'),
-                    'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP_CONTENT
-                ),
+          ),
+        ),
+        'group_label' => array(
+          'label' => t('Label Wrapper for Field Group'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP_LABEL,
+          'options' => array(
+            'show_label' => array(
+              '#type' => 'checkbox',
+              '#default_value' => TRUE,
+              '#title' => t('Show field group label'),
             ),
-        )
-    );
+          ),
+        ),
+        'group_content' => array(
+          'label' => t('Content Wrapper for Field Group'),
+          'selector' => CSS_WRAPPERS_DEFAULT_SELECTOR_FIELD_GROUP_CONTENT
+        ),
+      ),
+    ),
+  );
 }
+
+
 function css_wrappers_inherit_instance_field_group($data, $group, $type) {
-    $groups = field_group_info_groups($data['entity_type'], $data['bundle'], $data['view_mode']);
-    foreach($groups as $field_group) {
-        if (in_array($data['field_name'], $field_group->children)) {
-            if ($field_group->format_type === 'css_wrappers') {
-                $settings = unserialize($field_group->format_settings['instance_settings']['css_wrappers']);
-                if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
-                    return $settings[$group][$type];
-                }
-            }
-            while ($field_group->parent_name) {
-                $field_group = $groups[$field_group->parent_name];
-                if ($field_group->format_type === 'css_wrappers') {
-                    $settings = unserialize($field_group->format_settings['instance_settings']['css_wrappers']);
-                    if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
-                        return $settings[$group][$type];
-                    }
-                }
-            }
+  $groups = field_group_info_groups($data['entity_type'], $data['bundle'], $data['view_mode']);
+  foreach ($groups as $field_group) {
+    if (in_array($data['field_name'], $field_group->children)) {
+      if ($field_group->format_type === 'css_wrappers') {
+        $settings = unserialize($field_group->format_settings['instance_settings']['css_wrappers']);
+        if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
+          return $settings[$group][$type];
         }
+      }
+      while ($field_group->parent_name) {
+        $field_group = $groups[$field_group->parent_name];
+        if ($field_group->format_type === 'css_wrappers') {
+          $settings = unserialize($field_group->format_settings['instance_settings']['css_wrappers']);
+          if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
+            return $settings[$group][$type];
+          }
+        }
+      }
     }
+  }
 }
+
 
 function css_wrappers_inherit_group_direct($data, $group, $type) {
-    if ($data->format_type === 'css_wrappers') {
-        $settings = unserialize($data->format_settings['instance_settings']['css_wrappers']);
-        if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
-            return $settings[$group][$type];
-        }
+  if ($data->format_type === 'css_wrappers') {
+    $settings = unserialize($data->format_settings['instance_settings']['css_wrappers']);
+    if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
+      return $settings[$group][$type];
     }
+  }
 }
+
 
 function css_wrappers_inherit_group_parent($data, $group, $type) {
-    $groups = field_group_info_groups($data->entity_type, $data->bundle, $data->mode);
-    while ($data->parent_name) {
-        $data = $groups[$data->parent_name];
-        if ($data->format_type === 'css_wrappers') {
-            $settings = unserialize($data->format_settings['instance_settings']['css_wrappers']);
-            if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
-                return $settings[$group][$type];
-            }
-        }
+  $groups = field_group_info_groups($data->entity_type, $data->bundle, $data->mode);
+  while ($data->parent_name) {
+    $data = $groups[$data->parent_name];
+    if ($data->format_type === 'css_wrappers') {
+      $settings = unserialize($data->format_settings['instance_settings']['css_wrappers']);
+      if (isset($settings[$group][$type]) && $settings[$group][$type]['enabled']) {
+        return $settings[$group][$type];
+      }
     }
+  }
 }
+
+
 function css_wrappers_field_group_css_wrapper_inheritance_field_alter(&$inheritance) {
-    $inheritance = array_slice($inheritance, 0, 1, TRUE) +
-        array('instance_field_group' => t('Inherited from a containing field group')) +
-        array_slice($inheritance, 1, NULL, TRUE);
+  $inheritance = array_slice($inheritance, 0, 1, TRUE) +
+    array('instance_field_group' => t('Inherited from a containing field group')) +
+    array_slice($inheritance, 1, NULL, TRUE);
 }
+
+
 function css_wrappers_field_group_field_group_formatter_info() {
-    $field_wrappers = css_wrappers_inherit_defaults('field');
-    $group_wrappers = css_wrappers_inherit_defaults('field_group');
-    $all_settings = array(
-        'field' => $field_wrappers,
-        'field_group' => $group_wrappers,
-    );
-    return array(
-        'display' => array(
-            'css_wrappers' => array(
-                'label' => t('CSS Wrappers'),
-                'description' => t('Use CSS selectors to define wrappers for field group and contained fields'),
-                'instance_settings' => array(
-                    'css_wrappers' => serialize($all_settings),
-                ),
-            ),
+  $field_wrappers = css_wrappers_inherit_defaults('field');
+  $group_wrappers = css_wrappers_inherit_defaults('field_group');
+  $all_settings = array(
+    'field' => $field_wrappers,
+    'field_group' => $group_wrappers,
+  );
+  return array(
+    'display' => array(
+      'css_wrappers' => array(
+        'label' => t('CSS Wrappers'),
+        'description' => t('Use CSS selectors to define wrappers for field group and contained fields'),
+        'instance_settings' => array(
+          'css_wrappers' => serialize($all_settings),
         ),
+      ),
+    ),
+  );
+}
+
+
+function css_wrappers_field_group_field_group_format_summary($group) {
+  if ($group->format_type == 'css_wrappers') {
+    $settings = unserialize($group->format_settings['instance_settings']['css_wrappers']);
+    $group_wrappers = css_wrappers_inherit($group, 'field_group');
+    $status[] = '<div class="field-group-css-wrapper-form-summary"><div class="field-group-wrappers-summary">';
+    $inheritance = css_wrappers_group_inheritance('field_group');
+    foreach (css_wrappers_group_types('field_group') as $name => $data) {
+      if (isset($group_wrappers[$name])) {
+        $label = $data['label'];
+        $wrapper = $group_wrappers[$name];
+        $status[] =
+          '<dfn class="css-wrappers-dfn inheritance-' .  $wrapper['inheritance'] . '">' .
+          $label[0] .
+          '<div class="wrapper-info-wrap">' .
+          '<span class="wrapper-info wrapper-type">' . $label . '</span>' .
+          '<span class="wrapper-info wrapper-inheritance"> - ' . $inheritance[$wrapper['inheritance']] . '</span>' .
+          '<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>' .
+          '</div>' .
+          '</dfn>';
+      }
+    }
+    $status[] = '</div><div class="field-wrappers-summary">';
+    foreach (css_wrappers_group_types('field') as $name => $data) {
+      if (isset($settings['field'][$name])) {
+        $label = $data['label'];
+        $wrapper = $settings['field'][$name];
+        $status[] =
+          '<dfn class="css-wrappers-dfn inheritance-' .  ($wrapper['enabled'] ? 'enabled' : 'disabled') . '">' .
+          $label[0] .
+          '<div class="wrapper-info-wrap">' .
+          '<span class="wrapper-info wrapper-type">' .t('Contained ' . $label) . '</span>' .
+          '<span class="wrapper-info wrapper-inheritance"> - ' . ($wrapper['enabled'] ? 'Enabled' : 'Disabled' ) . '</span>' .
+          ($wrapper['enabled'] ? ('<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>') : '') .
+          '</div>' .
+          '</dfn>';
+      }
+    }
+    $status[] = '</div></div><!-- css wrappers start hide -->';
+    return implode('', $status);
+  }
+}
+
+
+function css_wrappers_field_group_field_group_format_settings($group) {
+  if ($group->format_type == 'css_wrappers') {
+    $group_name = $group->group_name;
+    $settings = unserialize($group->format_settings['instance_settings']['css_wrappers']);
+    $field_wrappers = $settings['field'];
+    $field_fallbacks = css_wrappers_inherit_defaults('field');
+    $group_wrappers = css_wrappers_inherit($group, 'field_group');
+    $group_fallbacks = css_wrappers_inherit($group, 'field_group', array(), array('#invert', 'group_direct'));
+    $form = array(
+      'css_wrappers' => array(
+        '#tree' => TRUE,
+        '#type' => 'fieldset',
+        '#title' => t('CSS Wrappers'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#description' => t('To override the default wrappers for this field group and its contained fields, check the box for the wrapper you wish to override and enter a valid CSS selector in the corresponding textfield.'),
+        'field_group' => array(
+          '#tree' => TRUE,
+          '#collapsible' => FALSE,
+          '#type' => 'fieldset',
+          '#title' => t('Field Group Wrappers'),
+          '#description' => t('These wrappers will be applied to the field group itself, and serve as defaults for contained field groups.'),
+        ),
+        'field' => array(
+          '#tree' => TRUE,
+          '#collapsible' => FALSE,
+          '#type' => 'fieldset',
+          '#title' => t('Contained Field Wrappers'),
+          '#description' => t('These wrappers will be applied, by default to any field contained in this field group.'),
+        ),
+      ),
     );
-}
-function css_wrappers_field_group_field_group_format_summary($group)
-{
-    if ($group->format_type == 'css_wrappers') {
-        $settings = unserialize($group->format_settings['instance_settings']['css_wrappers']);
-        $group_wrappers = css_wrappers_inherit($group, 'field_group');
-        $status[] = '<div class="field-group-css-wrapper-form-summary"><div class="field-group-wrappers-summary">';
-        $inheritance = css_wrappers_group_inheritance('field_group');
-        foreach(css_wrappers_group_types('field_group') as $name => $data) {
-            if (isset($group_wrappers[$name])) {
-                $label = $data['label'];
-                $wrapper = $group_wrappers[$name];
-                $status[] =
-                    '<dfn class="css-wrappers-dfn inheritance-' .  $wrapper['inheritance'] . '">' .
-                    $label[0] .
-                    '<div class="wrapper-info-wrap">' .
-                    '<span class="wrapper-info wrapper-type">' . $label . '</span>' .
-                    '<span class="wrapper-info wrapper-inheritance"> - ' . $inheritance[$wrapper['inheritance']] . '</span>' .
-                    '<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>' .
-                    '</div>' .
-                    '</dfn>';
-            }
-        }
-        $status[] = '</div><div class="field-wrappers-summary">';
-        foreach(css_wrappers_group_types('field') as $name => $data) {
-            if (isset($settings['field'][$name])) {
-                $label = $data['label'];
-                $wrapper = $settings['field'][$name];
-                $status[] =
-                    '<dfn class="css-wrappers-dfn inheritance-' .  ($wrapper['enabled'] ? 'enabled' : 'disabled') . '">' .
-                    $label[0] .
-                    '<div class="wrapper-info-wrap">' .
-                    '<span class="wrapper-info wrapper-type">' .t('Contained ' . $label) . '</span>' .
-                    '<span class="wrapper-info wrapper-inheritance"> - ' . ($wrapper['enabled'] ? 'Enabled' : 'Disabled' ) . '</span>' .
-                    ($wrapper['enabled'] ? ('<span class="wrapper-info wrapper-selector">' . (!empty($wrapper['selector']) ? $wrapper['selector'] : 'No Wrapper') . '</span>') : '') .
-                    '</div>' .
-                    '</dfn>';
-            }
-        }
-        $status[] = '</div></div><!-- css wrappers start hide -->';
-        return implode('', $status);
-    }
-}
-function css_wrappers_field_group_field_group_format_settings($group)
-{
-    if ($group->format_type == 'css_wrappers') {
-        $group_name = $group->group_name;
-        $settings = unserialize($group->format_settings['instance_settings']['css_wrappers']);
-        $field_wrappers = $settings['field'];
-        $field_fallbacks = css_wrappers_inherit_defaults('field');
-        $group_wrappers = css_wrappers_inherit($group, 'field_group');
-        $group_fallbacks = css_wrappers_inherit($group, 'field_group', array(), array('#invert', 'group_direct'));
-        $form = array(
-            'css_wrappers' => array(
-                '#tree' => TRUE,
-                '#type' => 'fieldset',
-                '#title' => t('CSS Wrappers'),
-                '#collapsible' => TRUE,
-                '#collapsed' => TRUE,
-                '#description' => t('To override the default wrappers for this field group and its contained fields, check the box for the wrapper you wish to override and enter a valid CSS selector in the corresponding textfield.'),
-                'field_group' => array(
-                    '#tree' => TRUE,
-                    '#collapsible' => FALSE,
-                    '#type' => 'fieldset',
-                    '#title' => t('Field Group Wrappers'),
-                    '#description' => t('These wrappers will be applied to the field group itself, and serve as defaults for contained field groups.'),
-                ),
-                'field' => array(
-                    '#tree' => TRUE,
-                    '#collapsible' => FALSE,
-                    '#type' => 'fieldset',
-                    '#title' => t('Contained Field Wrappers'),
-                    '#description' => t('These wrappers will be applied, by default to any field contained in this field group.'),
-                ),
+    foreach (css_wrappers_group_types('field_group') as $name => $type) {
+      $label = $type['label'];
+      $wrapper = $group_wrappers[$name];
+      $fallback = $group_fallbacks[$name];
+      if ($wrapper['inheritance'] === 'group_direct') {
+        $override = TRUE;
+      }
+      else {
+        $override = FALSE;
+      }
+      $form['css_wrappers']['field_group'][$name] = array(
+        '#tree' => TRUE,
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => array('clearfix'),
+        ),
+        'enabled' => array(
+          '#type' => 'checkbox',
+          '#default_value' => $override,
+          '#prefix' => '<div class="css-wrapper-enabled">',
+          '#suffix' => '</div>',
+        ),
+        'default' => array(
+          '#type' => 'textfield',
+          '#title' => t($label),
+          '#maxlength' => 255,
+          '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
+          '#default_value' => $fallback['selector'],
+          '#field_name' => $group->group_name,
+          '#css_wrapper' => $name,
+          '#disabled' => TRUE,
+          '#attributes' => array(
+            'placeholder' => t('No Wrapper'),
+          ),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group][' . $name . '][enabled]"]' => array(
+                'checked' => FALSE,
+              ),
             ),
-        );
-        foreach (css_wrappers_group_types('field_group') as $name => $type) {
-            $label = $type['label'];
-            $wrapper = $group_wrappers[$name];
-            $fallback = $group_fallbacks[$name];
-            $override = $wrapper['inheritance'] === 'group_direct' ? TRUE : FALSE;
-            $form['css_wrappers']['field_group'][$name] = array(
-                '#tree' => TRUE,
-                '#type' => 'container',
-                '#attributes' => array(
-                    'class' => array('clearfix'),
+          ),
+        ),
+        'default_options' => array(
+          '#type' => 'container',
+          '#prefix' => '<div class="css-wrappers-options">',
+          '#suffix' => '</div>',
+        ),
+        'selector' => array(
+          '#type' => 'textfield',
+          '#title' => t($label),
+          '#maxlength' => 255,
+          '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
+          '#default_value' => $wrapper['selector'],
+          '#element_validate' => array('css_wrappers_form_selector_validate'),
+          '#field_name' => $group_name,
+          '#css_wrapper' => $name,
+          '#css_wrapper_group' => 'field_group',
+          '#attributes' => array(
+            'placeholder' => t('No Wrapper'),
+          ),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group][' . $name . '][enabled]"]' => array(
+                'checked' => TRUE,
+              ),
+            ),
+          ),
+        ),
+        'options' => array(
+          '#type' => 'container',
+          '#prefix' => '<div class="css-wrappers-options">',
+          '#suffix' => '</div>',
+        ),
+      );
+      foreach (css_wrappers_type_default_options('field_group', $name) as $option => $data) {
+        $form['css_wrappers']['field_group'][$name]['default_options'][$option] = array(
+            '#disabled' => TRUE,
+            '#default_value' => $fallback['options'][$option],
+            '#states' => array(
+              'visible' => array(
+                ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group][' . $name . '][enabled]"]' => array(
+                  'checked' => FALSE,
                 ),
-                'enabled' => array(
-                    '#type' => 'checkbox',
-                    '#default_value' => $override,
-                    '#prefix' => '<div class="css-wrapper-enabled">',
-                    '#suffix' => '</div>',
+              ),
+            ),
+          ) + $data;
+        $form['css_wrappers']['field_group'][$name]['options'][$option] = array(
+            '#default_value' => $wrapper['options'][$option],
+            '#states' => array(
+              'visible' => array(
+                ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group][' . $name . '][enabled]"]' => array(
+                  'checked' => TRUE,
                 ),
-                'default' => array(
-                    '#type' => 'textfield',
-                    '#title' => t($label),
-                    '#maxlength' => 255,
-                    '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
-                    '#default_value' => $fallback['selector'],
-                    '#field_name' => $group->group_name,
-                    '#css_wrapper' => $name,
-                    '#disabled' => TRUE,
-                    '#attributes' => array(
-                        'placeholder' => t('No Wrapper'),
-                    ),
-                    '#states' => array(
-                        'visible' => array(
-                            ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group]['.$name.'][enabled]"]' => array('checked' => FALSE),
-                        )
-                    ),
-                ),
-                'default_options' => array(
-                    '#type' => 'container',
-                    '#prefix' => '<div class="css-wrappers-options">',
-                    '#suffix' => '</div>',
-                ),
-                'selector' => array(
-                    '#type' => 'textfield',
-                    '#title' => t($label),
-                    '#maxlength' => 255,
-                    '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
-                    '#default_value' => $wrapper['selector'],
-                    '#element_validate' => array('css_wrappers_form_selector_validate'),
-                    '#field_name' => $group_name,
-                    '#css_wrapper' => $name,
-                    '#css_wrapper_group' => 'field_group',
-                    '#attributes' => array(
-                        'placeholder' => t('No Wrapper'),
-                    ),
-                    '#states' => array(
-                        'visible' => array(
-                            ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group]['.$name.'][enabled]"]' => array('checked' => TRUE),
-                        ),
-                    ),
-                ),
-                'options' => array(
-                    '#type' => 'container',
-                    '#prefix' => '<div class="css-wrappers-options">',
-                    '#suffix' => '</div>',
-                )
-            );
-            foreach (css_wrappers_type_default_options('field_group', $name) as $option => $data) {
-                $form['css_wrappers']['field_group'][$name]['default_options'][$option] = array(
-                        '#disabled' => TRUE,
-                        '#default_value' => $fallback['options'][$option],
-                        '#states' => array(
-                            'visible' => array(
-                                ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group]['.$name.'][enabled]"]' => array('checked' => FALSE),
-                            )
-                        ),
-                    ) + $data;
-                $form['css_wrappers']['field_group'][$name]['options'][$option] = array(
-                        '#default_value' => $wrapper['options'][$option],
-                        '#states' => array(
-                            'visible' => array(
-                                ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field_group]['.$name.'][enabled]"]' => array('checked' => TRUE),
-                            ),
-                        ),
-                    ) + $data;
-            }
-        }
+              ),
+            ),
+          ) + $data;
+      }
+    }
+    foreach (css_wrappers_group_types('field') as $name => $type) {
+      $label = $type['label'];
+      $wrapper = $field_wrappers[$name];
+      $fallback = $field_fallbacks[$name];
+      $override = $wrapper['enabled'];
+      $form['css_wrappers']['field'][$name] = array(
+        '#tree' => TRUE,
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => array('clearfix'),
+        ),
+        'enabled' => array(
+          '#type' => 'checkbox',
+          '#default_value' => $override,
+          '#prefix' => '<div class="css-wrapper-enabled">',
+          '#suffix' => '</div>',
+        ),
+        'default' => array(
+          '#type' => 'textfield',
+          '#title' => t($label),
+          '#maxlength' => 255,
+          '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
+          '#default_value' => $fallback['selector'],
+          '#field_name' => $group_name,
+          '#css_wrapper' => $name,
+          '#css_wrapper_group' => 'field',
+          '#disabled' => TRUE,
+          '#attributes' => array(
+            'placeholder' => t('No Wrapper'),
+          ),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+                'checked' => FALSE,
+              ),
+            ),
+          ),
+        ),
+        'default_options' => array(
+          '#type' => 'container',
+          '#prefix' => '<div class="css-wrappers-options">',
+          '#suffix' => '</div>',
+        ),
+        'selector' => array(
+          '#type' => 'textfield',
+          '#title' => t($label),
+          '#maxlength' => 255,
+          '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
+          '#default_value' => $wrapper['selector'],
+          '#element_validate' => array('css_wrappers_form_selector_validate'),
+          '#field_name' => $group_name,
+          '#css_wrapper' => $name,
+          '#css_wrapper_group' => 'field',
+          '#attributes' => array(
+            'placeholder' => t('No Wrapper'),
+          ),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+                'checked' => TRUE,
+              ),
+            ),
+          ),
+        ),
+        'options' => array(
+          '#type' => 'container',
+          '#prefix' => '<div class="css-wrappers-options">',
+          '#suffix' => '</div>',
+        ),
+      );
+      foreach (css_wrappers_type_default_options('field', $name) as $option => $data) {
+        $form['css_wrappers']['field'][$name]['default_options'][$option] = array(
+          '#disabled' => TRUE,
+          '#default_value' => $fallback['options'][$option],
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+                'checked' => FALSE,
+              ),
+            ),
+          ),
+        ) + $data;
+        $form['css_wrappers']['field'][$name]['options'][$option] = array(
+          '#default_value' => $wrapper['options'][$option],
+          '#states' => array(
+            'visible' => array(
+              ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field][' . $name . '][enabled]"]' => array(
+                'checked' => TRUE,
+              ),
+            ),
+          ),
+        ) + $data;
+      }
+    }
+    return array('instance_settings' => $form);
+  }
+}
 
-        foreach (css_wrappers_group_types('field') as $name => $type) {
-            $label = $type['label'];
-            $wrapper = $field_wrappers[$name];
-            $fallback = $field_fallbacks[$name];
-            $override = $wrapper['enabled'];
-            $form['css_wrappers']['field'][$name] = array(
-                '#tree' => TRUE,
-                '#type' => 'container',
-                '#attributes' => array(
-                    'class' => array('clearfix'),
-                ),
-                'enabled' => array(
-                    '#type' => 'checkbox',
-                    '#default_value' => $override,
-                    '#prefix' => '<div class="css-wrapper-enabled">',
-                    '#suffix' => '</div>',
-                ),
-                'default' => array(
-                    '#type' => 'textfield',
-                    '#title' => t($label),
-                    '#maxlength' => 255,
-                    '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
-                    '#default_value' => $fallback['selector'],
-                    '#field_name' => $group_name,
-                    '#css_wrapper' => $name,
-                    '#css_wrapper_group' => 'field',
-                    '#disabled' => TRUE,
-                    '#attributes' => array(
-                        'placeholder' => t('No Wrapper'),
-                    ),
-                    '#states' => array(
-                        'visible' => array(
-                            ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => FALSE),
-                        )
-                    ),
-                ),
-                'default_options' => array(
-                    '#type' => 'container',
-                    '#prefix' => '<div class="css-wrappers-options">',
-                    '#suffix' => '</div>',
-                ),
-                'selector' => array(
-                    '#type' => 'textfield',
-                    '#title' => t($label),
-                    '#maxlength' => 255,
-                    '#description' => t('Example: <code>div#id.class1.class2 > span[attr="value"]</code>'),
-                    '#default_value' => $wrapper['selector'],
-                    '#element_validate' => array('css_wrappers_form_selector_validate'),
-                    '#field_name' => $group_name,
-                    '#css_wrapper' => $name,
-                    '#css_wrapper_group' => 'field',
-                    '#attributes' => array(
-                        'placeholder' => t('No Wrapper'),
-                    ),
-                    '#states' => array(
-                        'visible' => array(
-                            ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => TRUE),
-                        ),
-                    ),
-                ),
-                'options' => array(
-                    '#type' => 'container',
-                    '#prefix' => '<div class="css-wrappers-options">',
-                    '#suffix' => '</div>',
-                )
-            );
-            foreach (css_wrappers_type_default_options('field', $name) as $option => $data) {
-                $form['css_wrappers']['field'][$name]['default_options'][$option] = array(
-                        '#disabled' => TRUE,
-                        '#default_value' => $fallback['options'][$option],
-                        '#states' => array(
-                            'visible' => array(
-                                ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => FALSE),
-                            )
-                        ),
-                    ) + $data;
-                $form['css_wrappers']['field'][$name]['options'][$option] = array(
-                        '#default_value' => $wrapper['options'][$option],
-                        '#states' => array(
-                            'visible' => array(
-                                ':input[name="fields[' . $group_name .'][format_settings][settings][instance_settings][css_wrappers][field]['.$name.'][enabled]"]' => array('checked' => TRUE),
-                            ),
-                        ),
-                    ) + $data;
-            }
-        }
-        return array('instance_settings' => $form);
-    }
+
+function css_wrappers_field_group_module_implements_alter(&$implementations, $hook) {
+  if ($hook === 'form_alter' || $hook === 'form_field_ui_display_overview_form_alter') {
+    unset($implementations['css_wrappers_field_group']);
+    $implementations['css_wrappers_field_group'] = FALSE;
+  }
 }
-function css_wrappers_field_group_module_implements_alter(&$implementations, $hook)
-{
-    if ($hook === 'form_alter' || $hook === 'form_field_ui_display_overview_form_alter') {
-        unset($implementations['css_wrappers_field_group']);
-        $implementations['css_wrappers_field_group'] = FALSE;
-    }
-}
+
+
 function css_wrappers_field_group_form_field_ui_display_overview_form_alter(&$form, $form_state) {
-    $end = '<!-- css wrappers start hide -->';
-    if (isset($form['#groups'])) {
-        foreach($form['#groups'] as $name) {
-            $group = &$form['fields'][$name];
-            if (isset($group['format']['format_settings']['actions']['save_settings'])) {
-                array_unshift($group['format']['format_settings']['actions']['save_settings']['#submit'], 'css_wrappers_field_group_format_settings_form_submit');
-            }
-            if (stristr($group['settings_summary']['#markup'], $end) !== FALSE) {
-                $group['settings_summary']['#markup'] = substr($group['settings_summary']['#markup'], 0, strpos($group['settings_summary']['#markup'], $end)) . '</div>';
-            }
-        }
+  $end = '<!-- css wrappers start hide -->';
+  if (isset($form['#groups'])) {
+    foreach ($form['#groups'] as $name) {
+      $group = &$form['fields'][$name];
+      if (isset($group['format']['format_settings']['actions']['save_settings'])) {
+        array_unshift($group['format']['format_settings']['actions']['save_settings']['#submit'], 'css_wrappers_field_group_format_settings_form_submit');
+      }
+      if (stristr($group['settings_summary']['#markup'], $end) !== FALSE) {
+        $group['settings_summary']['#markup'] = substr($group['settings_summary']['#markup'], 0, strpos($group['settings_summary']['#markup'], $end)) . '</div>';
+      }
     }
-
+  }
 }
+
+
 function css_wrappers_field_group_format_settings_form_submit(&$form, &$form_state) {
-    $editing = $form_state['formatter_settings_edit'];
-    $settings = &$form_state['values']['fields'][$editing]['format_settings']['settings']['instance_settings']['css_wrappers'];
-    foreach ($settings as &$group) {
-        foreach($group as &$type) {
-            unset($type['default'], $type['default_options']);
-            if (!empty($type['selector'])) {
-                $processed = css_wrappers_from_css_selector($type['selector']);
-                if ($processed['selector'] && $processed['elements']) {
-                    $type['selector'] = $processed['selector'];
-                    $type['elements'] = $processed['elements'];
-                }
-            } else {
-                $type['selector'] = '';
-                $type['elements'] = array();
-            }
+  $editing = $form_state['formatter_settings_edit'];
+  $settings = &$form_state['values']['fields'][$editing]['format_settings']['settings']['instance_settings']['css_wrappers'];
+  foreach ($settings as &$group) {
+    foreach ($group as &$type) {
+      unset($type['default'], $type['default_options']);
+      if (!empty($type['selector'])) {
+        $processed = css_wrappers_from_css_selector($type['selector']);
+        if ($processed['selector'] && $processed['elements']) {
+          $type['selector'] = $processed['selector'];
+          $type['elements'] = $processed['elements'];
         }
+      }
+      else {
+        $type['selector'] = '';
+        $type['elements'] = array();
+      }
     }
-    $settings = serialize($settings);
+  }
+  $settings = serialize($settings);
 }
 
-function css_wrappers_field_group_field_group_pre_render(& $element, $group, & $form)
-{
-    if ($group->format_type === 'css_wrappers') {
 
-        $group_wrappers = css_wrappers_inherit($group, 'field_group');;
-        $outer_prefix = $outer_suffix = $content_prefix = $content_suffix = $label = '';
-        if (!empty($group->format_settings['label']) && $group_wrappers['group_label']['options']['show_label']) {
-            $label_text = t('@label', array('@label' => $group->format_settings['label']));
-            if (!empty($group_wrappers['group_label']['elements'])) {
-                $label = _css_wrappers_build_wrapper_string($group_wrappers['group_label']['elements'], $label_text);
-            } else {
-                $label = $label_text;
-            }
-        }
-        if (!empty($group_wrappers['group']['elements'])) {
-            $outer_prefix = _css_wrappers_build_wrapper_prefix($group_wrappers['group']['elements']);
-            $outer_suffix = _css_wrappers_build_wrapper_suffix($group_wrappers['group']['elements']);
-        }
-        if (!empty($group_wrappers['group_content']['elements'])) {
-            $content_prefix = _css_wrappers_build_wrapper_prefix($group_wrappers['group_content']['elements']);
-            $content_suffix = _css_wrappers_build_wrapper_suffix($group_wrappers['group_content']['elements']);
-        }
-        $element['#prefix'] = $outer_prefix . $label . $content_prefix;
-        $element['#suffix'] = $content_suffix . $outer_suffix;
+function css_wrappers_field_group_field_group_pre_render(& $element, $group, & $form) {
+  if ($group->format_type === 'css_wrappers') {
+    $group_wrappers = css_wrappers_inherit($group, 'field_group');;
+    $outer_prefix = $outer_suffix = $content_prefix = $content_suffix = $label = '';
+    if (!empty($group->format_settings['label']) && $group_wrappers['group_label']['options']['show_label']) {
+      $label_text = t('@label', array('@label' => $group->format_settings['label']));
+      if (!empty($group_wrappers['group_label']['elements'])) {
+        $label = _css_wrappers_build_wrapper_string($group_wrappers['group_label']['elements'], $label_text);
+      }
+      else {
+        $label = $label_text;
+      }
     }
-
+    if (!empty($group_wrappers['group']['elements'])) {
+      $outer_prefix = _css_wrappers_build_wrapper_prefix($group_wrappers['group']['elements']);
+      $outer_suffix = _css_wrappers_build_wrapper_suffix($group_wrappers['group']['elements']);
+    }
+    if (!empty($group_wrappers['group_content']['elements'])) {
+      $content_prefix = _css_wrappers_build_wrapper_prefix($group_wrappers['group_content']['elements']);
+      $content_suffix = _css_wrappers_build_wrapper_suffix($group_wrappers['group_content']['elements']);
+    }
+    $element['#prefix'] = $outer_prefix . $label . $content_prefix;
+    $element['#suffix'] = $content_suffix . $outer_suffix;
+  }
 }
