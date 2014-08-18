@@ -205,11 +205,11 @@ function _css_wrappers_build_wrapper_string($wrappers = array(), $content = arra
     $prefix = '';
     foreach ($wrappers as $wrapper) {
       $prefix .= '<' . $wrapper['#tag'];
-      if (isset($wrapper['#attributes_processed']) {
+      if (isset($wrapper['#attributes_processed'])) {
         $prefix .= $wrapper['#attributes_processed'];
       }
       else {
-        if (!empty($wrapper['#attributes']) {
+        if (!empty($wrapper['#attributes'])) {
           $prefix .= drupal_attributes($wrapper['#attributes']);
         }
         else {
@@ -855,7 +855,7 @@ function css_wrappers_group_default_options($group) {
 function css_wrappers_type_default_options($group, $type) {
   $info = css_wrappers_info();
   if (isset($info[$group]['types'][$type]['options'])) {
-    return $info[$group]['types'][$type]['options']
+    return $info[$group]['types'][$type]['options'];
   }
   else {
     return array();
